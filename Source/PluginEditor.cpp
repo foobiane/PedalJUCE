@@ -9,6 +9,8 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+#include "Pedal.h"
+
 //==============================================================================
 PedalJUCEAudioProcessorEditor::PedalJUCEAudioProcessorEditor (PedalJUCEAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
