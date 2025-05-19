@@ -4,6 +4,8 @@
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1">
   <MAINGROUP id="yhwo2X" name="PedalJUCE">
     <GROUP id="{7E2514A9-DB32-719E-2787-3FC40C574178}" name="Source">
+      <FILE id="chEPp1" name="Graph.cpp" compile="1" resource="0" file="Source/Graph.cpp"/>
+      <FILE id="h7WJK3" name="Graph.h" compile="0" resource="0" file="Source/Graph.h"/>
       <FILE id="W0OUf0" name="Pedal.h" compile="0" resource="0" file="Source/Pedal.h"/>
       <FILE id="Of6e0L" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
