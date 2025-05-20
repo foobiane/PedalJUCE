@@ -8,13 +8,19 @@
 template <typename T>
 class Graph {
     public:
+        Graph();
+        ~Graph();
+
+        std::vector<T> vertices();
         bool adjacent(T x, T y);
         std::unordered_set<T> neighbors(T x);
-        bool add_vertex(T x);
-        bool remove_vertex(T x);
-        bool add_edge(T x, T y);
-        bool remove_edge(T x, T y);
+        bool addVertex(T x);
+        bool removeVertex(T x);
+        bool addEdge(T x, T y);
+        bool removeEdge(T x, T y);
 
     private:
-        std::unordered_map<T, std::unordered_set<T>> adj_list;
+        std::unordered_map<T, std::unordered_set<T>> adjList;
 };
+
+#include "Graph.tpp"
