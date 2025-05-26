@@ -10,27 +10,6 @@
 #include <unordered_map>
 #include <vector>
 
-class Connector : public juce::Component {
-    public:
-        Connector();
-        ~Connector();
-
-        void setInput(Pedal* p, int channel);
-        void setOutput(Pedal* p, int channel);
-
-        void dragStart(juce::Point<float> pos);
-        void dragEnd(juce::Point<float> pos);
-        void mouseDown(const MouseEvent& e) override;
-        void mouseDrag(const MouseEvent& e) override;
-
-        void paint(juce::Graphics& g) override;
-
-    private:
-        // Connectors go from one channel of a pedal's output to one channel of a pedal's input
-        std::pair<Pedal*, int> outputPedalAndChannel;
-        std::pair<Pedal*, int> inputPedalAndChannel;
-}
-
 class Pedal : public juce::Component {
     public:
         Pedal();
@@ -71,8 +50,9 @@ class Pedal : public juce::Component {
         unsigned numInputChannels = 1;
         unsigned numOutputChannels = 1;
 
+        // Mapping of I/O channels to where they would be drawn on the pedals
         std::unordered_map<int, juce::Point<float>> inputChannelCoords;
         std::unordered_map<int, juce::Point<float>> outputChannelCoords;
 
-        void mapIOChannelsToCoords();
+        void mapIOChannelsToGlobalCoords();
 };

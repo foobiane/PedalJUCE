@@ -12,7 +12,7 @@ namespace BinaryData
     const int            MicrogrammaDBoldExte_otfSize = 33248;
 
     extern const char*   Graph_tpp;
-    const int            Graph_tppSize = 1468;
+    const int            Graph_tppSize = 1396;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
     const int namedResourceListSize = 2;

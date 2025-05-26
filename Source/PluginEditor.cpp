@@ -49,3 +49,38 @@ void PedalJUCEAudioProcessorEditor::resized()
     for (Pedal* ped : audioProcessor.connectionMap.vertices())
         ped->setBounds(0, 0, ped->getPedalWidth(), ped->getPedalHeight()); // 
 }
+
+void PedalJUCEAudioProcessorEditor::beginConnectorDrag(std::pair<Pedal*, int> start, std::pair<Pedal*, int> end, const juce::MouseEvent& e) {
+    Connector* c = (Connector*) e.originalComponent;
+    connectors.erase(c);
+    draggingConnector = c;
+
+    if (draggingConnector == nullptr)
+        draggingConnector = new Connector(this);
+
+    draggingConnector.setOutput(start.first, start.second)
+    draggingConnector.setInput(end.first, end.second);
+
+    addAndMakeVisible(draggingConnector);
+
+    dragConnector(e);
+}
+
+void PedalJUCEAudioProcessorEditor::dragConnector(const juce::MouseEvent& e) {
+    juce::MouseEvent* e2 = e.getEventRelativeTo(this);
+
+    if (draggingConnector != nullptr) {
+        Point<float> pos = e2.position();
+        
+    }
+}
+
+std::pair<Pedal*, int> PedalJUCEAudioProcessorEditor::getPortAt(Point<float> pos) {
+    for (Pedal* p : audioProcessor.connectionMap.vertices()) {
+        for ()
+    }
+}
+
+void PedalJUCEAudioProcessorEditor::endConnectorDrag(const juce::MouseEvent& e) {
+
+}

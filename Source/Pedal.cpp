@@ -1,5 +1,9 @@
 #include "Pedal.h"
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// PEDAL IMPLEMENTATION                                                                          //
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 juce::AudioBuffer<float>& Pedal::dsp(juce::AudioBuffer<float>& samples) {
     return samples;
 }
@@ -7,6 +11,7 @@ juce::AudioBuffer<float>& Pedal::dsp(juce::AudioBuffer<float>& samples) {
 Pedal::Pedal() {
     nameFont.setHeight(nameFontHeight);
     setSize(width, height);
+    mapIOChannelsToGlobalCoords();
 }
 
 Pedal::~Pedal() {
@@ -56,4 +61,20 @@ void Pedal::mouseDown(const juce::MouseEvent& e) {
 
 void Pedal::mouseDrag(const juce::MouseEvent& e) {
     drag.dragComponent(this, e, nullptr);
+}
+
+void Pedal::mapIOChannelsToGlobalCoords() {
+    Point<float> loc = getPosition();
+
+    for (int i = 0; i < numInputChannels; i++) {
+        float x = loc.getX() + width;
+        float y = loc.getY() + (i + 1) * (height / (numInputChannels + 1));
+        inputChannelCoords.insert({i, Point(x, y)});
+    }
+
+    for (int i = 0; i < numOutputChannels; i++) {
+        float x = loc.getX();
+        float y = loc.getY() + (i + 1) * (height / (numOutputChannels + 1));
+        inputChannelCoords.insert({i, Point(x, y)});
+    }
 }
