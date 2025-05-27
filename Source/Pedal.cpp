@@ -3,6 +3,11 @@
 Pedal::Pedal() {
     nameFont.setHeight(nameFontHeight);
     setSize(width, height);
+    uid = ID++;
+}
+
+uint32_t Pedal::getUID() {
+    return uid;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -63,6 +68,28 @@ void Pedal::paint(juce::Graphics& g) {
 
 void Pedal::resized() {
     // Nothing for now
+}
+
+int Pedal::getNumInputChannels() {
+    return numInputChannels;
+}
+
+int Pedal::getNumOutputChannels() {
+    return numOutputChannels;
+}
+
+juce::Point<int> Pedal::getGlobalPositionForInputChannel(int channel) {
+    if (channel < numInputChannels)
+        return inputPorts[channel].position + getPosition();
+
+    return Point<int>(0, 0);
+}
+
+juce::Point<int> Pedal::getGlobalPositionForOutputChannel(int channel) {
+    if (channel < numOutputChannels)
+        return outputPorts[channel].position + getPosition();
+
+    return Point<int>(0, 0);
 }
 
 void Pedal::mouseDown(const juce::MouseEvent& e) {

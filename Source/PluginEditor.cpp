@@ -17,7 +17,8 @@
 PedalJUCEAudioProcessorEditor::PedalJUCEAudioProcessorEditor (PedalJUCEAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
-    audioProcessor.connectionMap.addNode(std::make_unique<Pedal>());
+    std::unique_ptr<Pedal> p = std::make_unique<Pedal>();
+    audioProcessor.connectionMap.addNode(p, p.get()->getUID());
 
     for (juce::AudioProcessorGraph::Node* pedalNode : audioProcessor.connectionMap.getNodes())
         addAndMakeVisible(static_cast<Pedal*>(pedalNode->getProcessor()));
@@ -49,6 +50,6 @@ void PedalJUCEAudioProcessorEditor::resized()
 
     for (juce::AudioProcessorGraph::Node* pedalNode: audioProcessor.connectionMap.getNodes()) {
         Pedal* ped = static_cast<Pedal*>(pedalNode->getProcessor());
-        ped->setBounds(0, 0, ped->getPedalWidth(), ped->getPedalHeight()); // 
+        ped->setBounds(0, 0, ped->getPedalWidth(), ped->getPedalHeight()); 
     }
 }

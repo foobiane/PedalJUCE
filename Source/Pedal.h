@@ -4,13 +4,17 @@
 
 #include <JuceHeader.h>
 
+#include <cstdint>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
+static uint32_t ID = 0;
+
 class Pedal : public juce::Component, public juce::AudioProcessor {
     public:
         Pedal();
+        uint32_t getUID();
 
         int getPedalWidth();
         int getPedalHeight();
@@ -42,6 +46,13 @@ class Pedal : public juce::Component, public juce::AudioProcessor {
         void paint(juce::Graphics& g) override;
         void resized() override;
 
+        // I/O
+        int getNumInputChannels();
+        int getNumOutputChannels();
+        juce::Point<int> getGlobalPositionForInputChannel(int channel);
+        juce::Point<int> getGlobalPositionForOutputChannel(int channel);
+        void connectToInputPort(Connector* c);
+
         // Dragging logic
         juce::ComponentDragger drag;
         void mouseDown(const juce::MouseEvent& e) override;
@@ -57,7 +68,24 @@ class Pedal : public juce::Component, public juce::AudioProcessor {
         int width = 200;
         int height = 300;
 
+        // I/O
+        int numOutputChannels = 1;
+        int numInputChannels = 1;
+
+        // DSP stuff
         int sr;
         int blockSize;
+
+    private:
+        struct Port {
+            juce::Point<int> position; // local position
+            int channel;
+        };
+
+        std::vector<Port*> inputPorts;
+        std::vector<Port*> outputPorts;
+
+        // UID
+        uint32_t uid;
 };
 
