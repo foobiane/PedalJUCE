@@ -1,28 +1,38 @@
 #include "Pedal.h"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// PEDAL IMPLEMENTATION                                                                          //
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-juce::AudioBuffer<float>& Pedal::dsp(juce::AudioBuffer<float>& samples) {
-    return samples;
-}
-
 Pedal::Pedal() {
     nameFont.setHeight(nameFontHeight);
     setSize(width, height);
-    mapIOChannelsToGlobalCoords();
 }
 
-Pedal::~Pedal() {
-    // Nothing for now
-}
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// AudioProcessor Methods
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
-unsigned Pedal::getPedalWidth() {
+const juce::String Pedal::getName() const { return name; }
+void Pedal::prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) { sr = sampleRate; blockSize = maximumExpectedSamplesPerBlock; }
+void Pedal::releaseResources() { /* Nothing for now. */ } 
+void Pedal::processBlock(juce::AudioBuffer<float> &buffer, juce::MidiBuffer &midiMessages) { /* Nothing for now. */ } 
+double Pedal::getTailLengthSeconds() const { return 0.0; }
+bool Pedal::acceptsMidi() const { return false; } 
+bool Pedal::producesMidi() const { return false; } 
+juce::AudioProcessorEditor* Pedal::createEditor() { return nullptr; } 
+bool Pedal::hasEditor() const { return false; } 
+int Pedal::getNumPrograms() { return 0; } 
+int Pedal::getCurrentProgram() { return 0; } 
+void Pedal::setCurrentProgram(int index) { /* Nothing for now. */ } 
+const juce::String Pedal::getProgramName(int index) { return ""; } 
+void Pedal::changeProgramName(int index, const juce::String &newName) { /* Nothing for now. */ } 
+void Pedal::getStateInformation(juce::MemoryBlock &destData) { /* Nothing for now. */ } 
+void Pedal::setStateInformation(const void *data, int sizeInBytes) { /* Nothing for now. */ } 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+int Pedal::getPedalWidth() {
     return width;
 }
 
-unsigned Pedal::getPedalHeight() {
+int Pedal::getPedalHeight() {
     return height;
 }
 
@@ -61,20 +71,4 @@ void Pedal::mouseDown(const juce::MouseEvent& e) {
 
 void Pedal::mouseDrag(const juce::MouseEvent& e) {
     drag.dragComponent(this, e, nullptr);
-}
-
-void Pedal::mapIOChannelsToGlobalCoords() {
-    Point<float> loc = getPosition();
-
-    for (int i = 0; i < numInputChannels; i++) {
-        float x = loc.getX() + width;
-        float y = loc.getY() + (i + 1) * (height / (numInputChannels + 1));
-        inputChannelCoords.insert({i, Point(x, y)});
-    }
-
-    for (int i = 0; i < numOutputChannels; i++) {
-        float x = loc.getX();
-        float y = loc.getY() + (i + 1) * (height / (numOutputChannels + 1));
-        inputChannelCoords.insert({i, Point(x, y)});
-    }
 }

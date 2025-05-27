@@ -10,7 +10,6 @@
 
 #include <JuceHeader.h>
 
-#include "Graph.h"
 #include "Pedal.h"
 
 #include <unordered_map>
@@ -58,7 +57,7 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    Graph<Pedal*> connectionMap;
+    juce::AudioProcessorGraph connectionMap;
     
 private:
     //==============================================================================

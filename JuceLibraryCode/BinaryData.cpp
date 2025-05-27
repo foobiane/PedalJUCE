@@ -452,84 +452,6 @@ static const unsigned char temp_binary_data_0[] =
 
 const char* MicrogrammaDBoldExte_otf = (const char*) temp_binary_data_0;
 
-//================== Graph.tpp ==================
-static const unsigned char temp_binary_data_1[] =
-"template <typename T>\n"
-"Graph<T>::Graph() { /* Nothing for now */ }\n"
-"\n"
-"template <typename T>\n"
-"Graph<T>::~Graph() { /* Nothing for now */ }\n"
-"\n"
-"template <typename T>\n"
-"std::vector<T> Graph<T>::vertices() {\n"
-"    std::vector<T> vec;\n"
-"\n"
-"    for (auto& kv : adjList)\n"
-"        vec.push_back(kv.first);\n"
-"\n"
-"    return vec;\n"
-"}\n"
-"\n"
-"template <typename T>\n"
-"bool Graph<T>::adjacent(T x, T y) {\n"
-"    if (!adjList.contains(x))\n"
-"        return false;\n"
-"    \n"
-"    return adjList[x].contains(y);\n"
-"}\n"
-"\n"
-"template <typename T>\n"
-"std::unordered_set<T> Graph<T>::neighbors(T x) {\n"
-"    return adjList.get(x);\n"
-"}\n"
-"\n"
-"template <typename T>\n"
-"bool Graph<T>::addVertex(T x) {\n"
-"    if (adjList.contains(x))\n"
-"        return false;\n"
-"    \n"
-"    adjList.insert({x, std::unordered_set<T>()});\n"
-"    \n"
-"    return true;\n"
-"}\n"
-"\n"
-"template <typename T>\n"
-"bool Graph<T>::removeVertex(T x) {\n"
-"    if (!adjList.contains(x))\n"
-"        return false;\n"
-"    \n"
-"    adjList.erase(x);\n"
-"\n"
-"    for (auto& kv : adjList) {\n"
-"        if (kv.second.contains(x))\n"
-"            kv.second.erase(x);\n"
-"    }\n"
-"\n"
-"    return true;\n"
-"}\n"
-"\n"
-"template <typename T>\n"
-"bool Graph<T>::addEdge(T x, T y) {\n"
-"    if (!adjList.contains(x) || !adjList.contains(y))\n"
-"        return false;\n"
-"    \n"
-"    adjList[x].insert(y);\n"
-"\n"
-"    return true;\n"
-"}\n"
-"\n"
-"template <typename T>\n"
-"bool Graph<T>::removeEdge(T x, T y) {\n"
-"    if (!adjList.contains(x) || !adjList.contains(y) || !adjList[x].contains(y))\n"
-"        return false;\n"
-"\n"
-"    adjList[x].erase(y);\n"
-"\n"
-"    return true;\n"
-"}";
-
-const char* Graph_tpp = (const char*) temp_binary_data_1;
-
 
 const char* getNamedResource (const char* resourceNameUTF8, int& numBytes);
 const char* getNamedResource (const char* resourceNameUTF8, int& numBytes)
@@ -543,7 +465,6 @@ const char* getNamedResource (const char* resourceNameUTF8, int& numBytes)
     switch (hash)
     {
         case 0x7e08a560:  numBytes = 33248; return MicrogrammaDBoldExte_otf;
-        case 0x31827ae3:  numBytes = 1396; return Graph_tpp;
         default: break;
     }
 
@@ -553,14 +474,12 @@ const char* getNamedResource (const char* resourceNameUTF8, int& numBytes)
 
 const char* namedResourceList[] =
 {
-    "MicrogrammaDBoldExte_otf",
-    "Graph_tpp"
+    "MicrogrammaDBoldExte_otf"
 };
 
 const char* originalFilenames[] =
 {
-    "MicrogrammaD-BoldExte.otf",
-    "Graph.tpp"
+    "MicrogrammaD-BoldExte.otf"
 };
 
 const char* getNamedResourceOriginalFilename (const char* resourceNameUTF8);
