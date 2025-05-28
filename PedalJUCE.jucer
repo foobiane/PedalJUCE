@@ -8,8 +8,9 @@
             file="Fonts/MicrogrammaD-BoldExte.otf"/>
     </GROUP>
     <GROUP id="{7E2514A9-DB32-719E-2787-3FC40C574178}" name="Source">
-      <FILE id="pgpcBH" name="Pedal.cpp" compile="1" resource="0" file="Source/Pedal.cpp"/>
       <FILE id="W0OUf0" name="Pedal.h" compile="0" resource="0" file="Source/Pedal.h"/>
+      <FILE id="pgpcBH" name="Pedal.cpp" compile="1" resource="0" file="Source/Pedal.cpp"/>
+      <FILE id="Dm2EJl" name="Connector.cpp" compile="1" resource="0" file="Source/Connector.cpp"/>
       <FILE id="Of6e0L" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="VEiX6t" name="PluginProcessor.h" compile="0" resource="0"

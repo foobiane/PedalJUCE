@@ -4,10 +4,22 @@ Pedal::Pedal() {
     nameFont.setHeight(nameFontHeight);
     setSize(width, height);
     uid = ID++;
+    initializePorts();
 }
 
-uint32_t Pedal::getUID() {
-    return uid;
+void Pedal::initializePorts() {
+    for (int i = 0; i < numInputChannels; i++) {
+        juce::Point<int> pos = {width, (int) ((i + 1) * (height / (numInputChannels + 1)))};
+        inputPorts.push_back({pos, i});
+    }
+    for (int i = 0; i < numOutputChannels; i++) {
+        juce::Point<int> pos = {0, (int) ((i + 1) * (height / (numOutputChannels + 1)))};
+        outputPorts.push_back({pos, i});
+    }
+}
+
+juce::AudioProcessorGraph::NodeID Pedal::getUIDAsNodeID() {
+    return juce::AudioProcessorGraph::NodeID(uid);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -82,14 +94,14 @@ juce::Point<int> Pedal::getGlobalPositionForInputChannel(int channel) {
     if (channel < numInputChannels)
         return inputPorts[channel].position + getPosition();
 
-    return Point<int>(0, 0);
+    return juce::Point<int>(0, 0);
 }
 
 juce::Point<int> Pedal::getGlobalPositionForOutputChannel(int channel) {
     if (channel < numOutputChannels)
         return outputPorts[channel].position + getPosition();
 
-    return Point<int>(0, 0);
+    return juce::Point<int>(0, 0);
 }
 
 /**
@@ -108,8 +120,14 @@ void Pedal::untrackConnector(Connector* c) {
 }
 
 void Pedal::updateAllConnectors() {
-    for (Connector* c : connectors)
-        c.repaint();
+    for (Connector* c : connectors) {
+        if (c->isConnected())
+            c->adjustBounds();
+        else
+            c->resetBounds();
+
+        c->repaint();
+    }
 }
 
 void Pedal::mouseDown(const juce::MouseEvent& e) {

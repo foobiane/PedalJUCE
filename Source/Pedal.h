@@ -4,20 +4,20 @@
 
 #include <JuceHeader.h>
 
-#include <cstdint>
 #include <string>
 #include <unordered_set>
 #include <vector>
 
-static uint32_t ID = 0;
+static juce::uint32 ID = 0;
+static int MAX_CONNECTION_RANGE = 10;
 
 // Forward declaring the Connector class
-class Connector : public juce::Component;
+class Connector;
 
 class Pedal : public juce::Component, public juce::AudioProcessor {
     public:
         Pedal();
-        uint32_t getUID();
+        juce::AudioProcessorGraph::NodeID getUIDAsNodeID();
 
         int getPedalWidth();
         int getPedalHeight();
@@ -89,10 +89,57 @@ class Pedal : public juce::Component, public juce::AudioProcessor {
 
         std::vector<Port> inputPorts;
         std::vector<Port> outputPorts;
+        void initializePorts();
         
         std::unordered_set<Connector*> connectors;
 
         // UID
-        uint32_t uid;
+        juce::uint32 uid;
 };
 
+// This class is still being designed.
+// Here's what my abstract ideas are for a connector:
+// 1. Connectors sit on top of our pedals and are *not* subcomponents of them (but they may be tracked by them).
+// 2. Connectors are created when a user drags from the output port of a pedal to anywhere on the screen.
+// 3. Connectors constantly repaint themselves while the user is dragging.
+// 4. Connectors "connect" to the input ports of other pedals, and have a sensitivity of some amount of pixels.
+// 5. Once connected, connectors will modify the AudioProcessorGraph to reflect the connection between ports.
+// 6. Connectors are supposed to look like curled up cords.
+// 7. Connectors will move when the pedals they're connected to move.
+
+class Connector : public juce::Component {
+    public:
+        Connector(juce::AudioProcessorGraph* graph, Pedal* s, int channel);
+
+        bool isConnected();
+        void disconnect();
+
+        void resetBounds();
+        void adjustBounds();
+
+        void mouseDown(const juce::MouseEvent& e) override;
+        void mouseDrag(const juce::MouseEvent& e) override;
+        void mouseUp(const juce::MouseEvent& e) override;
+
+        void paint(juce::Graphics& g) override;
+        void resized() override;
+
+    private:
+        struct PedalAndChannel {
+            Pedal* pedal;
+            int channel;
+        };
+
+        PedalAndChannel start;
+        PedalAndChannel end;
+        
+        bool dragging = false;
+
+        void attemptConnection(const juce::MouseEvent& e);
+        juce::Point<int> getGlobalPositionOf(const juce::Point<int>& p);
+
+        juce::Path cablePath;
+        juce::Point<int> cursorPosition;
+
+        juce::AudioProcessorGraph* g;
+};

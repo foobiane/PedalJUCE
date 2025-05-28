@@ -9,8 +9,8 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
-#include "Connector.h"
 #include "Pedal.h"
+// #include "Connector.h"
 
 #include <memory>
 
@@ -18,19 +18,24 @@
 PedalJUCEAudioProcessorEditor::PedalJUCEAudioProcessorEditor (PedalJUCEAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
-    std::unique_ptr<Pedal> p = std::make_unique<Pedal>();
-    audioProcessor.connectionMap.addNode(p, p.get()->getUID());
+    std::unique_ptr<Pedal> ped = std::make_unique<Pedal>();
+
+    // Because we can only have one pointer at a time with unique pointers, we have to do this
+    // annoying step of getting the UID first before it gets moved.
+    juce::AudioProcessorGraph::NodeID uid = ped->getUIDAsNodeID();
+
+    audioProcessor.connectionMap.addNode(std::move(ped), uid);
 
     for (juce::AudioProcessorGraph::Node* pedalNode : audioProcessor.connectionMap.getNodes()) {
-        Pedal* ped = static_cast<Pedal*>(pedalNode->getProcessor())
+        Pedal* pdl = static_cast<Pedal*>(pedalNode->getProcessor());
         
-        for (int i = 0; i < ped->getNumOutputChannels(); i++) {
-            Connector* c = new Connector(audioProcessor.connectionMap, ped, i);
-            ped->trackConnector(c);
+        for (int i = 0; i < pdl->getNumOutputChannels(); i++) {
+            Connector* c = new Connector(&audioProcessor.connectionMap, pdl, i);
+            pdl->trackConnector(c);
             addAndMakeVisible(c);
         }
 
-        addAndMakeVisible(ped);
+        addAndMakeVisible(pdl);
     }
 
     // Make sure that before the constructor has finished, you've set the
