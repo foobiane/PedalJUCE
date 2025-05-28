@@ -9,6 +9,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+#include "Connector.h"
 #include "Pedal.h"
 
 #include <memory>
@@ -20,8 +21,17 @@ PedalJUCEAudioProcessorEditor::PedalJUCEAudioProcessorEditor (PedalJUCEAudioProc
     std::unique_ptr<Pedal> p = std::make_unique<Pedal>();
     audioProcessor.connectionMap.addNode(p, p.get()->getUID());
 
-    for (juce::AudioProcessorGraph::Node* pedalNode : audioProcessor.connectionMap.getNodes())
-        addAndMakeVisible(static_cast<Pedal*>(pedalNode->getProcessor()));
+    for (juce::AudioProcessorGraph::Node* pedalNode : audioProcessor.connectionMap.getNodes()) {
+        Pedal* ped = static_cast<Pedal*>(pedalNode->getProcessor())
+        
+        for (int i = 0; i < ped->getNumOutputChannels(); i++) {
+            Connector* c = new Connector(audioProcessor.connectionMap, ped, i);
+            ped->trackConnector(c);
+            addAndMakeVisible(c);
+        }
+
+        addAndMakeVisible(ped);
+    }
 
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
@@ -30,6 +40,7 @@ PedalJUCEAudioProcessorEditor::PedalJUCEAudioProcessorEditor (PedalJUCEAudioProc
 
 PedalJUCEAudioProcessorEditor::~PedalJUCEAudioProcessorEditor()
 {
+    // TODO: Clean up AudioProcessorGraph
 }
 
 //==============================================================================

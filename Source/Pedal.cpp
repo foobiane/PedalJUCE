@@ -92,10 +92,31 @@ juce::Point<int> Pedal::getGlobalPositionForOutputChannel(int channel) {
     return Point<int>(0, 0);
 }
 
+/**
+ * trackConnector():
+ *
+ * Marks a connected component for tracking. The pedal tracks its connectors *only* for the case
+ * where the pedal is dragged, which should cause all of the connectors to repaint.
+ */
+void Pedal::trackConnector(Connector* c) {
+    if (!connectors.contains(c))
+        connectors.insert(c);
+}
+
+void Pedal::untrackConnector(Connector* c) {
+    connectors.erase(c);
+}
+
+void Pedal::updateAllConnectors() {
+    for (Connector* c : connectors)
+        c.repaint();
+}
+
 void Pedal::mouseDown(const juce::MouseEvent& e) {
     drag.startDraggingComponent(this, e);
 }
 
 void Pedal::mouseDrag(const juce::MouseEvent& e) {
     drag.dragComponent(this, e, nullptr);
+    updateAllConnectors(); // this might be slow for a lot of connectors
 }

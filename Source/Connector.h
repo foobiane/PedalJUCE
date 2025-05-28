@@ -20,11 +20,18 @@ class Connector : public juce::Component {
     public:
         Connector(juce::AudioProcessorGraph& g, Pedal* s, int channel);
 
+        bool isConnected();
+        void disconnect();
+
+        void resetBounds();
+        void adjustBounds();
+
         void mouseDown(const juce::MouseEvent& e) override;
         void mouseDrag(const juce::MouseEvent& e) override;
         void mouseUp(const juce::MouseEvent& e) override;
 
         void paint(juce::Graphics& g) override;
+        void resized() override;
 
     private:
         struct PedalAndChannel {
@@ -34,8 +41,11 @@ class Connector : public juce::Component {
 
         PedalAndChannel start;
         PedalAndChannel end;
+        
+        bool dragging = false;
 
         void attemptConnection();
+        juce::Point<int> getGlobalPositionOf(const Point<int>& p);
 
         juce::Path cablePath;
 

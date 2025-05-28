@@ -6,10 +6,13 @@
 
 #include <cstdint>
 #include <string>
-#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 static uint32_t ID = 0;
+
+// Forward declaring the Connector class
+class Connector : public juce::Component;
 
 class Pedal : public juce::Component, public juce::AudioProcessor {
     public:
@@ -51,7 +54,9 @@ class Pedal : public juce::Component, public juce::AudioProcessor {
         int getNumOutputChannels();
         juce::Point<int> getGlobalPositionForInputChannel(int channel);
         juce::Point<int> getGlobalPositionForOutputChannel(int channel);
-        void connectToInputPort(Connector* c);
+        void trackConnector(Connector* c);
+        void untrackConnector(Connector* c);
+        void updateAllConnectors();
 
         // Dragging logic
         juce::ComponentDragger drag;
@@ -82,8 +87,10 @@ class Pedal : public juce::Component, public juce::AudioProcessor {
             int channel;
         };
 
-        std::vector<Port*> inputPorts;
-        std::vector<Port*> outputPorts;
+        std::vector<Port> inputPorts;
+        std::vector<Port> outputPorts;
+        
+        std::unordered_set<Connector*> connectors;
 
         // UID
         uint32_t uid;
