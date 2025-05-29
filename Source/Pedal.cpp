@@ -1,25 +1,52 @@
 #include "Pedal.h"
 
-Pedal::Pedal() {
+Pedal::Pedal(juce::AudioProcessorGraph* g) {
+    this->g = g;
+
     nameFont.setHeight(nameFontHeight);
     setSize(width, height);
-    uid = ID++;
+    uid = juce::AudioProcessorGraph::NodeID(ID++);
+
     initializePorts();
 }
 
 void Pedal::initializePorts() {
-    for (int i = 0; i < numInputChannels; i++) {
-        juce::Point<int> pos = {width, (int) ((i + 1) * (height / (numInputChannels + 1)))};
-        inputPorts.push_back({pos, i});
-    }
     for (int i = 0; i < numOutputChannels; i++) {
-        juce::Point<int> pos = {0, (int) ((i + 1) * (height / (numOutputChannels + 1)))};
-        outputPorts.push_back({pos, i});
+        juce::Point<int> pos = juce::Point<int>(0, (int)((i + 1) * (height / (numOutputChannels + 1)))) + getPosition();
+        Connector* c = new Connector(g, uid, i, pos);
+        connectors.push_back(c);
+    }
+
+    for (int i = 0; i < numInputChannels; i++) {
+        juce::Point<int> pos = juce::Point<int>(width, (int)((i + 1) * (height / (numInputChannels + 1)))) + getPosition();
+        juce::Rectangle<int> area(pos.translated(-1 * MAX_CONNECTION_RANGE, -1 * MAX_CONNECTION_RANGE), pos.translated(MAX_CONNECTION_RANGE, MAX_CONNECTION_RANGE));
+
+        InputPort* port = new InputPort();
+        port->setBounds(area);
+
+        inputPorts.push_back(port);
     }
 }
 
-juce::AudioProcessorGraph::NodeID Pedal::getUIDAsNodeID() {
-    return juce::AudioProcessorGraph::NodeID(uid);
+void Pedal::updatePorts() {
+    // All outgoing connectors
+    for (int i = 0; i < numOutputChannels; i++) {
+        juce::Point<int> pos = juce::Point<int>(0, (int)((i + 1) * (height / (numOutputChannels + 1)))) + getPosition();
+        connectors[i]->updateStartPoint(pos);
+    }
+
+    // All input ports and incoming connectors
+    for (int i = 0; i < numInputChannels; i++) {
+        juce::Point<int> pos = juce::Point<int>(width, (int)((i + 1) * (height / (numInputChannels + 1)))) + getPosition();
+        juce::Rectangle<int> oldBounds = inputPorts[i]->getBounds();
+
+        inputPorts[i]->setBounds(pos.x, pos.y, oldBounds.getWidth(), oldBounds.getHeight()); // TODO: Will this repaint properly??
+
+        // If our input port is connected to another connector, update that connector too
+        Connector* incoming = inputPorts[i]->getIncomingConnector();
+        if (incoming != nullptr)
+            incoming->updateEndPoint(pos);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -53,6 +80,10 @@ int Pedal::getPedalHeight() {
     return height;
 }
 
+juce::AudioProcessorGraph::NodeID Pedal::getNodeID() {
+    return uid;
+}
+
 void Pedal::paint(juce::Graphics& g) {
     g.setColour(juce::Colour((219.0f / 360.0f), 0.59f, 0.5f, 1.0f)); // sides
     g.fillRoundedRectangle(0, 0, width, height, 20);
@@ -77,53 +108,12 @@ int Pedal::getNumOutputChannels() {
     return numOutputChannels;
 }
 
-juce::Point<int> Pedal::getGlobalPositionForInputChannel(int channel) {
-    if (channel < numInputChannels)
-        return inputPorts[channel].position + getPosition();
-
-    return juce::Point<int>(0, 0);
+juce::Point<int> Pedal::getPositionOfInputPort(int channel) {
+    return inputPorts[channel]->getPosition().translated(MAX_CONNECTION_RANGE, MAX_CONNECTION_RANGE);
 }
 
-juce::Point<int> Pedal::getGlobalPositionForOutputChannel(int channel) {
-    if (channel < numOutputChannels)
-        return outputPorts[channel].position + getPosition();
-
-    return juce::Point<int>(0, 0);
-}
-
-/**
- * trackConnector():
- *
- * Marks a connected component for tracking. The pedal tracks its connectors *only* for the case
- * where the pedal is dragged, which should cause all of the connectors to repaint.
- */
-void Pedal::trackConnector(Connector* c) {
-    if (!connectors.contains(c))
-        connectors.insert(c);
-}
-
-/**
- * untrackConnector():
- *
- * Removes a connector from being tracked. See trackConnector() for more information.
- */
-void Pedal::untrackConnector(Connector* c) {
-    connectors.erase(c);
-}
-
-/**
- * updateAllConnectors():
- *
- * Causes all tracked connectors to adjust when the pedal is dragged. See trackConnector() for more
- * information.
- */
-void Pedal::updateAllConnectors() {
-    for (Connector* c : connectors) {
-        if (c->isConnected())
-            c->adjustBounds();
-        else
-            c->resetBounds();
-    }
+juce::Point<int> Pedal::getPositionOfOutputPort(int channel) {
+    return connectors[channel]->getStartPoint();
 }
 
 void Pedal::mouseDown(const juce::MouseEvent& e) {
@@ -132,5 +122,5 @@ void Pedal::mouseDown(const juce::MouseEvent& e) {
 
 void Pedal::mouseDrag(const juce::MouseEvent& e) {
     drag.dragComponent(this, e, nullptr);
-    updateAllConnectors(); // this might be slow for a lot of connectors
+    updatePorts();
 }

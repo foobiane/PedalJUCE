@@ -18,22 +18,22 @@
 PedalJUCEAudioProcessorEditor::PedalJUCEAudioProcessorEditor (PedalJUCEAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
-    std::unique_ptr<Pedal> ped = std::make_unique<Pedal>();
+    std::unique_ptr<Pedal> ped = std::make_unique<Pedal>(&audioProcessor.connectionMap);
 
     // Because we can only have one pointer at a time with unique pointers, we have to do this
     // annoying step of getting the UID first before it gets moved.
-    juce::AudioProcessorGraph::NodeID uid = ped->getUIDAsNodeID();
+    juce::AudioProcessorGraph::NodeID uid = ped->getNodeID();
 
     audioProcessor.connectionMap.addNode(std::move(ped), uid);
 
     for (juce::AudioProcessorGraph::Node* pedalNode : audioProcessor.connectionMap.getNodes()) {
         Pedal* pdl = static_cast<Pedal*>(pedalNode->getProcessor());
         
-        for (int i = 0; i < pdl->getNumOutputChannels(); i++) {
-            Connector* c = new Connector(&audioProcessor.connectionMap, pdl, i);
-            pdl->trackConnector(c);
-            addAndMakeVisible(c);
-        }
+        for (int i = 0; i < pdl->getNumOutputChannels(); i++)
+            addAndMakeVisible(pdl->connectors[i]);
+        
+        for (int i = 0; i < pdl->getNumInputChannels(); i++)
+            addAndMakeVisible(pdl->inputPorts[i]);
 
         addAndMakeVisible(pdl);
     }
