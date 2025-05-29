@@ -51,12 +51,7 @@ PedalJUCEAudioProcessorEditor::~PedalJUCEAudioProcessorEditor()
 //==============================================================================
 void PedalJUCEAudioProcessorEditor::paint (juce::Graphics& g)
 {
-    // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
-
-    // g.setColour (juce::Colours::white);
-    // g.setFont (juce::FontOptions (15.0f));
-    // g.drawFittedText ("Hello World!", getLocalBounds(), juce::Justification::centred, 1);
 }
 
 void PedalJUCEAudioProcessorEditor::resized()
@@ -66,6 +61,6 @@ void PedalJUCEAudioProcessorEditor::resized()
 
     for (juce::AudioProcessorGraph::Node* pedalNode: audioProcessor.connectionMap.getNodes()) {
         Pedal* ped = static_cast<Pedal*>(pedalNode->getProcessor());
-        ped->setBounds(0, 0, ped->getPedalWidth(), ped->getPedalHeight()); 
+        ped->setBounds(100, 100, ped->getPedalWidth(), ped->getPedalHeight()); 
     }
 }

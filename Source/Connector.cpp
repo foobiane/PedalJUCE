@@ -14,10 +14,11 @@ Connector::Connector(juce::AudioProcessorGraph* graph, Pedal* s, int channel) {
  * Sets the boundaries of the component to a square encircling the starting port.
  */
 void Connector::resetBounds() {
-    juce::Point<int> startPoint = start.pedal->getGlobalPositionForInputChannel(start.channel);
+    juce::Point<int> startPoint = start.pedal->getGlobalPositionForOutputChannel(start.channel);
     juce::Rectangle<int> area(startPoint.translated(-1 * MAX_CONNECTION_RANGE, -1 * MAX_CONNECTION_RANGE), startPoint.translated(MAX_CONNECTION_RANGE, MAX_CONNECTION_RANGE));
 
     setBounds(area);
+    repaint();
 }
 
 /**
@@ -26,10 +27,20 @@ void Connector::resetBounds() {
  * Sets the boundaries of the component to span the starting port to the most recent cursor point.
  */
 void Connector::adjustBounds() {
-    juce::Point<int> startPoint = start.pedal->getGlobalPositionForInputChannel(start.channel);
-    juce::Rectangle<int> area(startPoint, cursorPosition.translated(MAX_CONNECTION_RANGE, MAX_CONNECTION_RANGE));
+    juce::Point<int> startPoint = start.pedal->getGlobalPositionForOutputChannel(start.channel);
+    juce::Point<int> startPointAdjusted = juce::Point<int>(
+        cursorPosition.x < startPoint.x ? startPoint.x + MAX_CONNECTION_RANGE : startPoint.x - MAX_CONNECTION_RANGE,
+        cursorPosition.y < startPoint.y ? startPoint.y + MAX_CONNECTION_RANGE : startPoint.y - MAX_CONNECTION_RANGE
+    ); // adjusting start point to include start ellipse
 
-    setBounds(area);
+    juce::Rectangle<int> newBounds = juce::Rectangle<int>(startPointAdjusted, cursorPosition).expanded(4.0f);
+
+    if (getBounds() != newBounds)
+        setBounds(newBounds);
+    else
+        resized();
+
+    repaint();
 }
 
 /**
@@ -45,15 +56,11 @@ bool Connector::isConnected() {
 /**
  * disconnect():
  *
- * Disconnects the connector by removing the relevant connection from the AudioProcessorGraph,
+ * Disconnects the Connector by removing the relevant connection from the AudioProcessorGraph,
  * untracking it from the end pedal, and setting the end to a nullptr.
  */
 void Connector::disconnect() {
     if (isConnected()) {
-        juce::AudioProcessorGraph::NodeAndChannel connectStart, connectEnd;
-        connectStart.nodeID = start.pedal->getUIDAsNodeID(); connectStart.channelIndex = start.channel;
-        connectEnd.nodeID = end.pedal->getUIDAsNodeID(); connectEnd.channelIndex = end.channel;
-
         juce::AudioProcessorGraph::Connection c({start.pedal->getUIDAsNodeID(), start.channel}, {end.pedal->getUIDAsNodeID(), end.channel});
         g->removeConnection(c);
 
@@ -66,10 +73,9 @@ void Connector::disconnect() {
 void Connector::mouseDown(const juce::MouseEvent& e) {
     if (!isConnected()) {
         dragging = true;
-        cursorPosition = e.getPosition();
+        cursorPosition = e.getPosition() + getPosition();
+
         adjustBounds();
-        
-        repaint();
     }
     
     // TODO: Add logic for deleting connections
@@ -78,10 +84,9 @@ void Connector::mouseDown(const juce::MouseEvent& e) {
 // Inherited from juce::Component.
 void Connector::mouseDrag(const juce::MouseEvent& e) {
     if (!isConnected()) {
-        cursorPosition = e.getPosition();
-        adjustBounds();
+        cursorPosition = e.getPosition() + getPosition();
 
-        repaint();
+        adjustBounds();
     }
 
     // TODO: Add logic for deleting connections
@@ -95,13 +100,11 @@ void Connector::mouseUp(const juce::MouseEvent& e) {
         if (!isConnected()) 
             resetBounds();
         else {
-            cursorPosition = end.pedal->getGlobalPositionForInputChannel(end.channel);
+            cursorPosition = end.pedal->getGlobalPositionForInputChannel(end.channel); // TODO: Fix me
             adjustBounds();
         }
 
         dragging = false;
-
-        repaint();
     }   
 
     // TODO: Add logic for deleting connections
@@ -111,29 +114,28 @@ void Connector::mouseUp(const juce::MouseEvent& e) {
 void Connector::paint(juce::Graphics& g) {
     g.setColour(juce::Colours::yellow);
 
+    juce::Point<int> startPoint = start.pedal->getGlobalPositionForOutputChannel(start.channel) - getPosition();
+    juce::Rectangle<float> area(startPoint.translated(-1 * MAX_CONNECTION_RANGE, -1 * MAX_CONNECTION_RANGE).toFloat(), startPoint.translated(MAX_CONNECTION_RANGE, MAX_CONNECTION_RANGE).toFloat());
+    g.fillEllipse(area);
+
     if (isConnected() || dragging)
         g.fillPath(cablePath);
-
-    else {
-        juce::Point<int> startPoint = start.pedal->getGlobalPositionForOutputChannel(start.channel) - getPosition();
-        juce::Rectangle<float> area(startPoint.translated(-1 * MAX_CONNECTION_RANGE, -1 * MAX_CONNECTION_RANGE).toFloat(), startPoint.translated(MAX_CONNECTION_RANGE, MAX_CONNECTION_RANGE).toFloat());
-        g.fillEllipse(area);
-    }
 }
 
 // Inherited from juce::Component.
 void Connector::resized() {
     // Note that we do all of this in resized() since this function is called during a boundary
-    // change. Boundary changes only occur when we're dragging->
+    // change. Boundary changes only occur when we're dragging. 
 
     juce::Point<int> startPoint = start.pedal->getGlobalPositionForOutputChannel(start.channel) - getPosition();
-    
+    juce::Point<int> endPoint = cursorPosition - getPosition();
+
     cablePath.clear();
     cablePath.startNewSubPath(startPoint.toFloat());
     cablePath.cubicTo(
-        startPoint.x, startPoint.y + (cursorPosition.y - startPoint.y) * 0.33f,
-        cursorPosition.x, cursorPosition.y + (cursorPosition.y - startPoint.y) * 0.66f,
-        cursorPosition.x, cursorPosition.y
+        startPoint.x, startPoint.y + (endPoint.y - startPoint.y) * 0.33f,
+        endPoint.x, startPoint.y + (endPoint.y - startPoint.y) * 0.66f,
+        endPoint.x, endPoint.y
     );
 
     juce::PathStrokeType wideStroke (8.0f);
@@ -159,7 +161,7 @@ void Connector::attemptConnection(const juce::MouseEvent& e) {
         for (int channel = 0; channel < ped->getNumInputChannels(); channel++) {
             juce::AudioProcessorGraph::Connection potentialConnection = {{startNodeID, start.channel}, {pedalNode->nodeID, channel}};
 
-            if (ped->getGlobalPositionForInputChannel(channel).getDistanceFrom(getGlobalPositionOf(e.getPosition())) <= MAX_CONNECTION_RANGE && g->canConnect(potentialConnection)) {
+            if (ped->getGlobalPositionForInputChannel(channel).getDistanceFrom(cursorPosition) <= MAX_CONNECTION_RANGE && g->canConnect(potentialConnection)) {
                 end = {ped, channel};
                 ped->trackConnector(this); 
                 g->addConnection(potentialConnection);
@@ -168,15 +170,4 @@ void Connector::attemptConnection(const juce::MouseEvent& e) {
             }
         }
     }
-}
-
-/**
- * getGlobalPositionOf():
- * 
- * Returns the "global" position of a point represented within the component, i.e., the position
- * of the point relative to the component containing the connector (in this case, the editor
- * window).
- */
-juce::Point<int> Connector::getGlobalPositionOf(const juce::Point<int>& p) {
-    return p + getPosition();
 }

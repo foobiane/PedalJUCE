@@ -136,7 +136,6 @@ class Connector : public juce::Component {
         bool dragging = false;
 
         void attemptConnection(const juce::MouseEvent& e);
-        juce::Point<int> getGlobalPositionOf(const juce::Point<int>& p);
 
         juce::Path cablePath;
         juce::Point<int> cursorPosition;
