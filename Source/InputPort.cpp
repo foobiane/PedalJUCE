@@ -14,7 +14,11 @@ Connector* InputPort::getIncomingConnector() {
 
 void InputPort::paint(juce::Graphics& g) {
     g.setColour(juce::Colours::red);
-    g.fillEllipse(getBounds().toFloat());
+    
+    juce::Rectangle<int> bounds = getBounds();
+    int width = bounds.getWidth(), height = bounds.getHeight();
+
+    g.fillEllipse(0, 0, width, height);
 }
 
 void InputPort::resized() {

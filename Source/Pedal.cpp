@@ -2,12 +2,21 @@
 
 Pedal::Pedal(juce::AudioProcessorGraph* g) {
     this->g = g;
+    uid = juce::AudioProcessorGraph::NodeID(ID++);
 
     nameFont.setHeight(nameFontHeight);
     setSize(width, height);
-    uid = juce::AudioProcessorGraph::NodeID(ID++);
 
+    setPlayConfigDetails(numInputChannels, numOutputChannels, DEFAULT_SAMPLE_RATE, DEFAULT_BLOCK_SIZE);
     initializePorts();
+}
+
+Pedal::~Pedal() {
+    for (Connector* c : connectors)
+        delete c; // TODO: Handle connections too
+
+    for (InputPort* ip : inputPorts)
+        delete ip;
 }
 
 void Pedal::initializePorts() {
@@ -40,7 +49,7 @@ void Pedal::updatePorts() {
         juce::Point<int> pos = juce::Point<int>(width, (int)((i + 1) * (height / (numInputChannels + 1)))) + getPosition();
         juce::Rectangle<int> oldBounds = inputPorts[i]->getBounds();
 
-        inputPorts[i]->setBounds(pos.x, pos.y, oldBounds.getWidth(), oldBounds.getHeight()); // TODO: Will this repaint properly??
+        inputPorts[i]->setBounds(pos.x - MAX_CONNECTION_RANGE, pos.y - MAX_CONNECTION_RANGE, oldBounds.getWidth(), oldBounds.getHeight()); // TODO: Will this repaint properly??
 
         // If our input port is connected to another connector, update that connector too
         Connector* incoming = inputPorts[i]->getIncomingConnector();
@@ -54,7 +63,14 @@ void Pedal::updatePorts() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 const juce::String Pedal::getName() const { return name; }
-void Pedal::prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) { sr = sampleRate; blockSize = maximumExpectedSamplesPerBlock; }
+
+void Pedal::prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) { 
+    sr = sampleRate; 
+    blockSize = maximumExpectedSamplesPerBlock; 
+
+    setPlayConfigDetails(numInputChannels, numOutputChannels, sr, blockSize);
+}
+
 void Pedal::releaseResources() { /* Nothing for now. */ } 
 void Pedal::processBlock(juce::AudioBuffer<float> &buffer, juce::MidiBuffer &midiMessages) { /* Nothing for now. */ } 
 double Pedal::getTailLengthSeconds() const { return 0.0; }

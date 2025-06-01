@@ -1,9 +1,11 @@
 #include "Pedal.h"
 
+#include <iostream>
+
 Connector::Connector(juce::AudioProcessorGraph* graph, juce::AudioProcessorGraph::NodeID id, int channel, juce::Point<int> startPt) {
     g = graph;
 
-    start.nodeID = id; start.channelIndex = channel;;
+    start = {id, channel};
     startPoint = startPt;
 
     resetBounds();
@@ -49,12 +51,7 @@ void Connector::resetBounds() {
  * Sets the boundaries of the component to span the starting port to the most recent cursor point.
  */
 void Connector::adjustBounds() {
-    juce::Point<int> startPointAdjusted = juce::Point<int>(
-        endPoint.x < startPoint.x ? startPoint.x + MAX_CONNECTION_RANGE : startPoint.x - MAX_CONNECTION_RANGE,
-        endPoint.y < startPoint.y ? startPoint.y + MAX_CONNECTION_RANGE : startPoint.y - MAX_CONNECTION_RANGE
-    ); // adjusting start point to include start ellipse
-
-    juce::Rectangle<int> newBounds = juce::Rectangle<int>(startPointAdjusted, endPoint).expanded(4.0f);
+    juce::Rectangle<int> newBounds = juce::Rectangle<int>(startPoint, endPoint).expanded(MAX_CONNECTION_RANGE);
 
     if (getBounds() != newBounds)
         setBounds(newBounds);
@@ -113,7 +110,8 @@ void Connector::mouseDrag(const juce::MouseEvent& e) {
 // Inherited from juce::Component.
 void Connector::mouseUp(const juce::MouseEvent& e) {
     if (!connected) {
-        attemptConnection(e);
+        endPoint = e.getPosition() + getPosition();
+        attemptConnection();
 
         if (!connected) 
             resetBounds();
@@ -170,7 +168,7 @@ void Connector::resized() {
  * 
  * Otherwise, nothing happens.
  */
-void Connector::attemptConnection(const juce::MouseEvent& e) {
+void Connector::attemptConnection() {
     for (juce::AudioProcessorGraph::Node* pedalNode : g->getNodes()) {
         Pedal* ped = static_cast<Pedal*>(pedalNode->getProcessor());
 
@@ -178,12 +176,24 @@ void Connector::attemptConnection(const juce::MouseEvent& e) {
             juce::AudioProcessorGraph::Connection potentialConnection(start, {pedalNode->nodeID, channel});
 
             if (ped->getPositionOfInputPort(channel).getDistanceFrom(endPoint) <= MAX_CONNECTION_RANGE && g->canConnect(potentialConnection)) {
-                end = {pedalNode->nodeID, channel};
-                ped->inputPorts[channel]->setIncomingConnector(this);
-                g->addConnection(potentialConnection);
+                std::cout << "Connection successful" << std::endl;
+                
+                end = {pedalNode->nodeID, channel}; // marking the end connection
+                ped->inputPorts[channel]->setIncomingConnector(this); // storing the connection in the port
+                g->addConnection(potentialConnection); // marking the connection in the AudioProcessorGraph
+                connected = true; // maintaining a boolean to know when to not read end
 
                 return;
             }
+
+            std::cout << "Connection to Pedal " << ped->getNodeID().uid << " on input channel " << channel << " failed because: ";
+
+            if (ped->getPositionOfInputPort(channel).getDistanceFrom(endPoint) > MAX_CONNECTION_RANGE)
+                std::cout << "Too far away (distance: " << ped->getPositionOfInputPort(channel).getDistanceFrom(endPoint) << ")";
+            else
+                std::cout << "Cannot make connection in graph";
+            
+            std::cout << std::endl;
         }
     }
 }

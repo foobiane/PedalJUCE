@@ -24,6 +24,12 @@ public:
     PedalJUCEAudioProcessorEditor (PedalJUCEAudioProcessor&);
     ~PedalJUCEAudioProcessorEditor() override;
 
+    template <typename T>
+    Pedal* addPedalToEditor();
+    
+    template <typename T>
+    void removePedalFromEditor(Pedal* ped);
+
     //==============================================================================
     void paint (juce::Graphics&) override;
     void resized() override;
