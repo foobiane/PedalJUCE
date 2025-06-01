@@ -45,13 +45,17 @@ class Connector : public juce::Component {
         juce::AudioProcessorGraph::NodeAndChannel start;
         juce::AudioProcessorGraph::NodeAndChannel end;
         
+        // juce::Point<int> intermediatePoint1;
+        // juce::Point<int> intermediatePoint2; // Used for adjusting the connector position, maybe implement me
+
         bool connected = false;
         bool dragging = false;
+        bool showingControls = false;
 
         void attemptConnection();
 
         juce::Path cablePath;
-        juce::Point<int> startPoint;
+        juce::Point<int> startPoint; // relative to the global parent class, NOT this class's coordinates
         juce::Point<int> endPoint;
 
         juce::AudioProcessorGraph* g;

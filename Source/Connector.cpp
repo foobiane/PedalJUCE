@@ -92,8 +92,17 @@ void Connector::mouseDown(const juce::MouseEvent& e) {
 
         adjustBounds();
     }
-    
-    // TODO: Add logic for deleting connections
+    else {
+        if (showingControls) {
+            juce::Point<float> m = cablePath.getPointAlongPath(cablePath.getLength() / 4);
+
+            if ((e.getPosition() + getPosition()).toFloat().getDistanceFrom(m + getPosition().toFloat()) <= MAX_CONNECTION_RANGE)
+                disconnect();
+        }
+
+        showingControls = !showingControls; // toggle
+        repaint();
+    }
 }
 
 // Inherited from juce::Component.
@@ -104,7 +113,7 @@ void Connector::mouseDrag(const juce::MouseEvent& e) {
         adjustBounds();
     }
 
-    // TODO: Add logic for deleting connections
+    // TODO: Add logic for dragging connections
 }
 
 // Inherited from juce::Component.
@@ -121,9 +130,7 @@ void Connector::mouseUp(const juce::MouseEvent& e) {
         }
 
         dragging = false;
-    }   
-
-    // TODO: Add logic for deleting connections
+    }
 }
 
 // Inherited from juce::Component.
@@ -136,6 +143,22 @@ void Connector::paint(juce::Graphics& g) {
 
     if (isConnected() || dragging)
         g.fillPath(cablePath);
+
+    if (showingControls) {
+        // Draws an X at the center of the cable path for removing connections
+        std::cout << "Displaying controls" << std::endl;
+
+        juce::Point<float> m = cablePath.getPointAlongPath(cablePath.getLength() / 4);
+
+        g.setColour(juce::Colours::red);
+        g.drawLine(m.x - MAX_CONNECTION_RANGE, m.y - MAX_CONNECTION_RANGE,
+                   m.x + MAX_CONNECTION_RANGE, m.y + MAX_CONNECTION_RANGE,
+                   4.0f);
+
+        g.drawLine(m.x - MAX_CONNECTION_RANGE, m.y + MAX_CONNECTION_RANGE,
+                   m.x + MAX_CONNECTION_RANGE, m.y - MAX_CONNECTION_RANGE,
+                   4.0f);
+    }
 }
 
 // Inherited from juce::Component.
