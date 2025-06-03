@@ -22,6 +22,12 @@ PedalJUCEAudioProcessor::PedalJUCEAudioProcessor()
                        )
 #endif
 {
+    connectionMap.setPlayConfigDetails(
+        getMainBusNumInputChannels(),
+        getMainBusNumOutputChannels(),
+        44100, // dummy
+        1024 // dummy
+    );
 }
 
 PedalJUCEAudioProcessor::~PedalJUCEAudioProcessor()

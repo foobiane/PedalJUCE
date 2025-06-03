@@ -126,7 +126,11 @@ void Connector::mouseUp(const juce::MouseEvent& e) {
         if (!connected) 
             resetBounds();
         else {
-            endPoint = getEndPedal()->getPositionOfInputPort(end.channelIndex);
+            // Good code would make this polymorphic so we don't have to check, but IDC for now.
+            if (end.nodeID == OUTPUT_BOX_NODE_ID)
+                endPoint = static_cast<OutputBox*>(g->getNodeForId(end.nodeID)->getProcessor())->getPositionOfPort(end.channelIndex);
+            else
+                endPoint = getEndPedal()->getPositionOfInputPort(end.channelIndex);
             adjustBounds();
         }
 

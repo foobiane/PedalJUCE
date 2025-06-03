@@ -9,9 +9,6 @@ class InputBox : public juce::AudioProcessorGraph::AudioGraphIOProcessor, public
     public:
         InputBox(juce::AudioProcessorGraph* graph, int w, int h);
 
-        bool isInput() { return true; }
-        bool isOutput() { return false; }
-
         int getNumChannels() { return numChannels; }
         void setWidth(int newWidth) { width = newWidth; }
         int getWidth() { return width; }
@@ -36,9 +33,6 @@ class InputBox : public juce::AudioProcessorGraph::AudioGraphIOProcessor, public
 class OutputBox : public juce::AudioProcessorGraph::AudioGraphIOProcessor, public juce::Component {
     public:
         OutputBox(juce::AudioProcessorGraph* graph, int w, int h);
-
-        bool isInput() { return false; }
-        bool isOutput() { return true; }
         
         int getNumChannels() { return numChannels; }
         void setWidth(int newWidth) { width = newWidth; }

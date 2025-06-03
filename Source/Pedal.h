@@ -9,9 +9,9 @@
 #include <vector>
 
 static juce::uint32 ID = 2;
-static const int MAX_CONNECTION_RANGE = 10;
-static const int DEFAULT_SAMPLE_RATE = 44100;
-static const int DEFAULT_BLOCK_SIZE = 1024;
+const int MAX_CONNECTION_RANGE = 10;
+const int DEFAULT_SAMPLE_RATE = 44100;
+const int DEFAULT_BLOCK_SIZE = 1024;
 
 // Forward declaring the Pedal class for use in Connector
 class Pedal;

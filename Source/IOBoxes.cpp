@@ -1,7 +1,5 @@
 #include "IOBoxes.h"
 
-#include <iostream> // debug
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // InputBox
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -11,8 +9,7 @@ InputBox::InputBox(juce::AudioProcessorGraph* graph, int w, int h) : juce::Audio
     width = w;
     height = h;
 
-    numChannels = 2; // TODO: Make this detect the number of audio channels automatically
-    setPlayConfigDetails(0, numChannels, DEFAULT_SAMPLE_RATE, DEFAULT_BLOCK_SIZE);
+    numChannels = g->getTotalNumInputChannels(); // TODO: Make this detect the number of audio channels automatically
 
     initializePorts();
 }
@@ -20,7 +17,7 @@ InputBox::InputBox(juce::AudioProcessorGraph* graph, int w, int h) : juce::Audio
 void InputBox::initializePorts() {
     for (int i = 0; i < numChannels; i++) {
         juce::Point<int> pos = juce::Point<int>(0, (int)((i + 1) * (height / (numChannels + 1)))) + getPosition();
-        ports.push_back(new Connector(g, juce::AudioProcessorGraph::NodeID(0), i, pos));
+        ports.push_back(new Connector(g, INPUT_BOX_NODE_ID, i, pos));
     }
 }
 
@@ -57,8 +54,7 @@ OutputBox::OutputBox(juce::AudioProcessorGraph* graph, int w, int h) : juce::Aud
     width = w;
     height = h;
 
-    numChannels = 2;
-    setPlayConfigDetails(numChannels, 0, DEFAULT_SAMPLE_RATE, DEFAULT_BLOCK_SIZE);
+    numChannels = g->getTotalNumOutputChannels();
 
     initializePorts();
 }
