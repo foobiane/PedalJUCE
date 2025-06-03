@@ -1,6 +1,7 @@
+#include "IOBoxes.h"
 #include "Pedal.h"
 
-#include <iostream>
+#include <iostream> // debug
 
 Connector::Connector(juce::AudioProcessorGraph* graph, juce::AudioProcessorGraph::NodeID id, int channel, juce::Point<int> startPt) {
     g = graph;
@@ -94,7 +95,7 @@ void Connector::mouseDown(const juce::MouseEvent& e) {
     }
     else {
         if (showingControls) {
-            juce::Point<float> m = cablePath.getPointAlongPath(cablePath.getLength() / 4);
+            juce::Point<float> m = cablePath.getPointAlongPath(cablePath.getLength() / 4).translated(-0.5 * pathThickness, -0.5 * pathThickness);
 
             if ((e.getPosition() + getPosition()).toFloat().getDistanceFrom(m + getPosition().toFloat()) <= MAX_CONNECTION_RANGE)
                 disconnect();
@@ -148,16 +149,20 @@ void Connector::paint(juce::Graphics& g) {
         // Draws an X at the center of the cable path for removing connections
         std::cout << "Displaying controls" << std::endl;
 
-        juce::Point<float> m = cablePath.getPointAlongPath(cablePath.getLength() / 4);
+        juce::Point<float> m = cablePath.getPointAlongPath(cablePath.getLength() / 4).translated(-0.5 * pathThickness, -0.5 * pathThickness);
 
         g.setColour(juce::Colours::red);
-        g.drawLine(m.x - MAX_CONNECTION_RANGE, m.y - MAX_CONNECTION_RANGE,
-                   m.x + MAX_CONNECTION_RANGE, m.y + MAX_CONNECTION_RANGE,
-                   4.0f);
+        g.drawLine(
+            m.x - MAX_CONNECTION_RANGE, m.y - MAX_CONNECTION_RANGE,
+            m.x + MAX_CONNECTION_RANGE, m.y + MAX_CONNECTION_RANGE,
+            6.0f
+        );
 
-        g.drawLine(m.x - MAX_CONNECTION_RANGE, m.y + MAX_CONNECTION_RANGE,
-                   m.x + MAX_CONNECTION_RANGE, m.y - MAX_CONNECTION_RANGE,
-                   4.0f);
+        g.drawLine(
+            m.x - MAX_CONNECTION_RANGE, m.y + MAX_CONNECTION_RANGE,
+            m.x + MAX_CONNECTION_RANGE, m.y - MAX_CONNECTION_RANGE,
+            6.0f
+        );
     }
 }
 
@@ -177,7 +182,7 @@ void Connector::resized() {
         endPointAdjusted.x, endPointAdjusted.y
     );
 
-    juce::PathStrokeType wideStroke (8.0f);
+    juce::PathStrokeType wideStroke(pathThickness);
     wideStroke.createStrokedPath(cablePath, cablePath);
 }
 
@@ -192,15 +197,32 @@ void Connector::resized() {
  * Otherwise, nothing happens.
  */
 void Connector::attemptConnection() {
+    OutputBox* opb = dynamic_cast<OutputBox*>(g->getNodeForId(OUTPUT_BOX_NODE_ID)->getProcessor());
+
+    // Edge Case: Handling a connection to the output box
+    for (int channel = 0; channel < opb->getNumChannels(); channel++) {
+        juce::AudioProcessorGraph::Connection potentialConnection(start, {OUTPUT_BOX_NODE_ID, channel});
+
+        if (opb->getPositionOfPort(channel).getDistanceFrom(endPoint) <= MAX_CONNECTION_RANGE && g->canConnect(potentialConnection)) {
+            end = {OUTPUT_BOX_NODE_ID, channel};
+            opb->ports[channel]->setIncomingConnector(this);
+            g->addConnection(potentialConnection);
+            connected = true; 
+        }
+    }
+
+    // Handling all other pedals in the graph
     for (juce::AudioProcessorGraph::Node* pedalNode : g->getNodes()) {
+        // Skip IO boxes, since we will have already checked them at this point
+        if (pedalNode->nodeID == INPUT_BOX_NODE_ID || pedalNode->nodeID == OUTPUT_BOX_NODE_ID)
+            continue;
+
         Pedal* ped = static_cast<Pedal*>(pedalNode->getProcessor());
 
         for (int channel = 0; channel < ped->getNumInputChannels(); channel++) {
             juce::AudioProcessorGraph::Connection potentialConnection(start, {pedalNode->nodeID, channel});
 
-            if (ped->getPositionOfInputPort(channel).getDistanceFrom(endPoint) <= MAX_CONNECTION_RANGE && g->canConnect(potentialConnection)) {
-                std::cout << "Connection successful" << std::endl;
-                
+            if (ped->getPositionOfInputPort(channel).getDistanceFrom(endPoint) <= MAX_CONNECTION_RANGE && g->canConnect(potentialConnection)) {                
                 end = {pedalNode->nodeID, channel}; // marking the end connection
                 ped->inputPorts[channel]->setIncomingConnector(this); // storing the connection in the port
                 g->addConnection(potentialConnection); // marking the connection in the AudioProcessorGraph
@@ -208,15 +230,6 @@ void Connector::attemptConnection() {
 
                 return;
             }
-
-            std::cout << "Connection to Pedal " << ped->getNodeID().uid << " on input channel " << channel << " failed because: ";
-
-            if (ped->getPositionOfInputPort(channel).getDistanceFrom(endPoint) > MAX_CONNECTION_RANGE)
-                std::cout << "Too far away (distance: " << ped->getPositionOfInputPort(channel).getDistanceFrom(endPoint) << ")";
-            else
-                std::cout << "Cannot make connection in graph";
-            
-            std::cout << std::endl;
         }
     }
 }

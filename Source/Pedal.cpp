@@ -5,15 +5,18 @@ Pedal::Pedal(juce::AudioProcessorGraph* g) {
     uid = juce::AudioProcessorGraph::NodeID(ID++);
 
     nameFont.setHeight(nameFontHeight);
-    setSize(width, height);
 
     setPlayConfigDetails(numInputChannels, numOutputChannels, DEFAULT_SAMPLE_RATE, DEFAULT_BLOCK_SIZE);
     initializePorts();
+    
+    setSize(width, height);
 }
 
 Pedal::~Pedal() {
-    for (Connector* c : connectors)
+    for (Connector* c : connectors) {
+        c->disconnect();
         delete c; // TODO: Handle connections too
+    }
 
     for (InputPort* ip : inputPorts)
         delete ip;
@@ -113,7 +116,7 @@ void Pedal::paint(juce::Graphics& g) {
 }
 
 void Pedal::resized() {
-    // Nothing for now
+    updatePorts();
 }
 
 int Pedal::getNumInputChannels() {

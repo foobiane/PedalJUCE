@@ -8,7 +8,7 @@
 #include <unordered_set>
 #include <vector>
 
-static juce::uint32 ID = 0;
+static juce::uint32 ID = 2;
 static const int MAX_CONNECTION_RANGE = 10;
 static const int DEFAULT_SAMPLE_RATE = 44100;
 static const int DEFAULT_BLOCK_SIZE = 1024;
@@ -55,6 +55,8 @@ class Connector : public juce::Component {
         void attemptConnection();
 
         juce::Path cablePath;
+        float pathThickness = 8.0f;
+
         juce::Point<int> startPoint; // relative to the global parent class, NOT this class's coordinates
         juce::Point<int> endPoint;
 

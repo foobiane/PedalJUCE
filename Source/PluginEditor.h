@@ -24,6 +24,8 @@ public:
     PedalJUCEAudioProcessorEditor (PedalJUCEAudioProcessor&);
     ~PedalJUCEAudioProcessorEditor() override;
 
+    void addIOBoxesToEditor();
+
     template <typename T>
     Pedal* addPedalToEditor();
     
@@ -38,6 +40,8 @@ private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     PedalJUCEAudioProcessor& audioProcessor;
+    
+    int editorWidth = 1200, editorHeight = 900;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PedalJUCEAudioProcessorEditor)
 };
