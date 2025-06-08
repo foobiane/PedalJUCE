@@ -80,7 +80,12 @@ bool Connector::isConnected() {
 void Connector::disconnect() {
     if (connected) {
         g->removeConnection(juce::AudioProcessorGraph::Connection(start, end));
-        getEndPedal()->inputPorts[end.channelIndex]->setIncomingConnector(nullptr);
+
+        if (end.nodeID == OUTPUT_BOX_NODE_ID)
+            static_cast<OutputBox*>(g->getNodeForId(end.nodeID)->getProcessor())->ports[end.channelIndex]->setIncomingConnector(nullptr);
+        else
+            getEndPedal()->inputPorts[end.channelIndex]->setIncomingConnector(nullptr);
+
         connected = false;
     }
 }
@@ -93,8 +98,10 @@ void Connector::mouseDown(const juce::MouseEvent& e) {
 
         adjustBounds();
     }
+    // For connected components
     else {
-        if (showingControls) {
+        // If the user clicked on the x
+        if (showingControls && cablePath.contains(e.getPosition())) {
             juce::Point<float> m = cablePath.getPointAlongPath(cablePath.getLength() / 4).translated(-0.5 * pathThickness, -0.5 * pathThickness);
 
             if ((e.getPosition() + getPosition()).toFloat().getDistanceFrom(m + getPosition().toFloat()) <= MAX_CONNECTION_RANGE)
@@ -226,7 +233,7 @@ void Connector::attemptConnection() {
         for (int channel = 0; channel < ped->getNumInputChannels(); channel++) {
             juce::AudioProcessorGraph::Connection potentialConnection(start, {pedalNode->nodeID, channel});
 
-            if (ped->getPositionOfInputPort(channel).getDistanceFrom(endPoint) <= MAX_CONNECTION_RANGE && g->canConnect(potentialConnection)) {                
+            if (ped->getPositionOfInputPort(channel).getDistanceFrom(endPoint) <= MAX_CONNECTION_RANGE && !g->isConnected(potentialConnection) && g->canConnect(potentialConnection)) {                
                 end = {pedalNode->nodeID, channel}; // marking the end connection
                 ped->inputPorts[channel]->setIncomingConnector(this); // storing the connection in the port
                 g->addConnection(potentialConnection); // marking the connection in the AudioProcessorGraph

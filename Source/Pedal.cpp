@@ -1,14 +1,22 @@
 #include "Pedal.h"
 
-Pedal::Pedal(juce::AudioProcessorGraph* g) {
-    this->g = g;
+Pedal::Pedal(juce::AudioProcessorGraph* graph, int editorW, int editorH) {
+    g = graph;
+    editorWidth = editorW;
+    editorHeight = editorH;
+
     uid = juce::AudioProcessorGraph::NodeID(ID++);
 
     nameFont.setHeight(nameFontHeight);
 
-    setPlayConfigDetails(numInputChannels, numOutputChannels, DEFAULT_SAMPLE_RATE, DEFAULT_BLOCK_SIZE);
+    setPlayConfigDetails(
+        numInputChannels, 
+        numOutputChannels, 
+        DEFAULT_SAMPLE_RATE, 
+        DEFAULT_BLOCK_SIZE
+    );
     initializePorts();
-    
+
     setSize(width, height);
 }
 
@@ -71,7 +79,12 @@ void Pedal::prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock
     sr = sampleRate; 
     blockSize = maximumExpectedSamplesPerBlock; 
 
-    setPlayConfigDetails(numInputChannels, numOutputChannels, sr, blockSize);
+    setPlayConfigDetails(
+        numInputChannels, 
+        numOutputChannels, 
+        DEFAULT_SAMPLE_RATE, 
+        DEFAULT_BLOCK_SIZE
+    );
 }
 
 void Pedal::releaseResources() { /* Nothing for now. */ } 
@@ -108,11 +121,11 @@ void Pedal::paint(juce::Graphics& g) {
     g.fillRoundedRectangle(0, 0, width, height, 20);
 
     g.setColour(juce::Colour((219.0f / 360.0f), 0.59f, 0.75f, 1.0f)); // recessed top part
-    g.fillRoundedRectangle(0, 0, width, height - 25, 20);
+    g.fillRoundedRectangle(0, 0, width, height - pedalThickness, 20);
 
     g.setColour(juce::Colours::black);
     g.setFont(nameFont);
-    g.drawText(name, 0, (int) (0.5 * (height - 25)) - nameFontHeight, width, nameFontHeight, juce::Justification::centred, true);
+    g.drawText(name, 0, (int) (0.5 * (height - pedalThickness)) - nameFontHeight, width, nameFontHeight, juce::Justification::centred, true);
 }
 
 void Pedal::resized() {

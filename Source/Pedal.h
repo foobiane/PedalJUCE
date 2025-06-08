@@ -4,14 +4,13 @@
 
 #include <JuceHeader.h>
 
+#include "Constants.h"
+
 #include <string>
 #include <unordered_set>
 #include <vector>
 
 static juce::uint32 ID = 2;
-const int MAX_CONNECTION_RANGE = 10;
-const int DEFAULT_SAMPLE_RATE = 44100;
-const int DEFAULT_BLOCK_SIZE = 1024;
 
 // Forward declaring the Pedal class for use in Connector
 class Pedal;
@@ -79,12 +78,12 @@ class InputPort : public juce::Component {
 
 class Pedal : public juce::Component, public juce::AudioProcessor {
     public:
-        Pedal(juce::AudioProcessorGraph* g);
+        Pedal(juce::AudioProcessorGraph* g, int editorW, int editorH);
         ~Pedal();
 
-        int getPedalWidth();
-        int getPedalHeight();
-        juce::AudioProcessorGraph::NodeID getNodeID();
+        int getPedalWidth() final;
+        int getPedalHeight() final;
+        juce::AudioProcessorGraph::NodeID getNodeID() final;
 
         /*
          * AudioProcessor Methods
@@ -94,7 +93,7 @@ class Pedal : public juce::Component, public juce::AudioProcessor {
          */
         virtual const juce::String getName() const override;
         virtual void prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) override;
-        virtual void releaseResources() override; // INHERITORS REDEFINE
+        virtual void releaseResources() override; // INHERITORS REDEFINE (IF NECESSARY)
         virtual void processBlock(juce::AudioBuffer<float> &buffer, juce::MidiBuffer &midiMessages) override; // INHERITORS REDEFINE
         virtual double getTailLengthSeconds() const override;
         virtual bool acceptsMidi() const override; // INHERITORS REDEFINE
@@ -114,14 +113,14 @@ class Pedal : public juce::Component, public juce::AudioProcessor {
         void resized() override;
 
         // I/O
-        int getNumInputChannels();
-        int getNumOutputChannels();
+        int getNumInputChannels() final;
+        int getNumOutputChannels() final;
 
         std::vector<Connector*> connectors; // send output
         std::vector<InputPort*> inputPorts; // receive input
 
-        juce::Point<int> getPositionOfInputPort(int channel);
-        juce::Point<int> getPositionOfOutputPort(int channel);
+        juce::Point<int> getPositionOfInputPort(int channel) final;
+        juce::Point<int> getPositionOfOutputPort(int channel) final;
     
         // Dragging logic
         juce::ComponentDragger drag;
@@ -137,14 +136,19 @@ class Pedal : public juce::Component, public juce::AudioProcessor {
         // Pedal dimensions
         int width = 200;
         int height = 300;
+        int pedalThickness = 25;
+
+        // Editor dimensions, which can be used to set the width and height
+        int editorWidth;
+        int editorHeight;
 
         // I/O
         int numOutputChannels = 1;
         int numInputChannels = 1;
 
         // DSP stuff
-        int sr;
-        int blockSize;
+        int sr = DEFAULT_SAMPLE_RATE;
+        int blockSize = DEFAULT_BLOCK_SIZE;
 
     private:
         void initializePorts();

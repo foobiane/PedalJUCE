@@ -10,6 +10,7 @@
 
 #include <JuceHeader.h>
 
+#include "Constants.h"
 #include "Pedal.h"
 #include "PluginProcessor.h"
 
@@ -41,7 +42,7 @@ private:
     // access the processor object that created it.
     PedalJUCEAudioProcessor& audioProcessor;
     
-    int editorWidth = 1200, editorHeight = 900;
+    int editorWidth = DEFAULT_EDITOR_WIDTH, editorHeight = DEFAULT_EDITOR_HEIGHT;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PedalJUCEAudioProcessorEditor)
 };
