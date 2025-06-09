@@ -81,9 +81,9 @@ class Pedal : public juce::Component, public juce::AudioProcessor {
         Pedal(juce::AudioProcessorGraph* g, int editorW, int editorH);
         ~Pedal();
 
-        int getPedalWidth() final;
-        int getPedalHeight() final;
-        juce::AudioProcessorGraph::NodeID getNodeID() final;
+        virtual int getPedalWidth() final;
+        virtual int getPedalHeight() final;
+        virtual juce::AudioProcessorGraph::NodeID getNodeID() final;
 
         /*
          * AudioProcessor Methods
@@ -113,14 +113,14 @@ class Pedal : public juce::Component, public juce::AudioProcessor {
         void resized() override;
 
         // I/O
-        int getNumInputChannels() final;
-        int getNumOutputChannels() final;
+        virtual int getNumInputChannels() final;
+        virtual int getNumOutputChannels() final;
 
         std::vector<Connector*> connectors; // send output
         std::vector<InputPort*> inputPorts; // receive input
 
-        juce::Point<int> getPositionOfInputPort(int channel) final;
-        juce::Point<int> getPositionOfOutputPort(int channel) final;
+        virtual juce::Point<int> getPositionOfInputPort(int channel) final;
+        virtual juce::Point<int> getPositionOfOutputPort(int channel) final;
     
         // Dragging logic
         juce::ComponentDragger drag;

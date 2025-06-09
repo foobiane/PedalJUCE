@@ -101,7 +101,7 @@ void Connector::mouseDown(const juce::MouseEvent& e) {
     // For connected components
     else {
         // If the user clicked on the x
-        if (showingControls && cablePath.contains(e.getPosition())) {
+        if (showingControls && cablePath.contains(e.getPosition().toFloat())) {
             juce::Point<float> m = cablePath.getPointAlongPath(cablePath.getLength() / 4).translated(-0.5 * pathThickness, -0.5 * pathThickness);
 
             if ((e.getPosition() + getPosition()).toFloat().getDistanceFrom(m + getPosition().toFloat()) <= MAX_CONNECTION_RANGE)

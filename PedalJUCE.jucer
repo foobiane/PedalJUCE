@@ -4,8 +4,9 @@
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" cppLanguageStandard="20">
   <MAINGROUP id="yhwo2X" name="PedalJUCE">
     <GROUP id="{D448E904-FD01-1219-59A5-94C109E2CE02}" name="Pedals">
-      <GROUP id="{563311F3-E89C-42E0-34EC-FD98F289438C}" name="Custom"/>
-      <GROUP id="{640A33CD-813D-AB74-D7B2-445C3BEC4738}" name="BuiltIn"/>
+      <GROUP id="{640A33CD-813D-AB74-D7B2-445C3BEC4738}" name="IncludeScript">
+        <FILE id="HAn7gn" name="IncludeAll.c" compile="1" resource="0" file="Pedals/IncludeScript/IncludeAll.c"/>
+      </GROUP>
     </GROUP>
     <GROUP id="{10A71BB5-182A-BBCF-9BE3-354943879C34}" name="Fonts">
       <FILE id="TRlFmn" name="MicrogrammaD-BoldExte.otf" compile="0" resource="1"

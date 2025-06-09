@@ -11,17 +11,13 @@
 
 #include "IOBoxes.h"
 #include "Pedal.h"
+#include "PedalIncludes.h"
 
 #include <memory>
 #include <type_traits>
 
-template <typename T>
-Pedal* PedalJUCEAudioProcessorEditor::addPedalToEditor() {
-    static_assert(std::is_base_of<Pedal, T>::value, "T must inherit from Pedal");
-
-    // Adding to the graph must be handled outside of the Pedal class due to the use of unique_ptr.
-    // (Why the fuck do we do this to ourselves?)
-    std::unique_ptr<Pedal> ped = std::make_unique<T>(&audioProcessor.connectionMap);
+// Adds the pedal referenced by a unique pointer to the editor interface.
+Pedal* PedalJUCEAudioProcessorEditor::addPedalToEditor(std::unique_ptr<Pedal> ped) {
     juce::AudioProcessorGraph::NodeID uid = ped->getNodeID();
     audioProcessor.connectionMap.addNode(std::move(ped), uid);
 
@@ -39,10 +35,8 @@ Pedal* PedalJUCEAudioProcessorEditor::addPedalToEditor() {
     return p;
 }
 
-template <typename T>
+// Removes a pedal from the editor interface.
 void PedalJUCEAudioProcessorEditor::removePedalFromEditor(Pedal* p) {
-    static_assert(std::is_base_of<Pedal, T>::value, "T must inherit from Pedal");
-
     for (int i = 0; i < p->getNumOutputChannels(); i++)
         removeChildComponent(p->connectors[i]);
     
@@ -55,6 +49,7 @@ void PedalJUCEAudioProcessorEditor::removePedalFromEditor(Pedal* p) {
     delete p;
 }   
 
+// Adds IO boxes to the editor interface.
 void PedalJUCEAudioProcessorEditor::addIOBoxesToEditor() {
     std::unique_ptr<InputBox> ipb = std::make_unique<InputBox>(&audioProcessor.connectionMap, 0.1 * editorWidth, 0.8 * editorHeight);
     std::unique_ptr<OutputBox> opb = std::make_unique<OutputBox>(&audioProcessor.connectionMap, 0.1 * editorWidth, 0.8 * editorHeight);
@@ -80,8 +75,8 @@ PedalJUCEAudioProcessorEditor::PedalJUCEAudioProcessorEditor (PedalJUCEAudioProc
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
     addIOBoxesToEditor();
-    addPedalToEditor<Pedal>();
-    addPedalToEditor<Pedal>();
+    
+    // TODO: Add testing pedals here!
 
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
