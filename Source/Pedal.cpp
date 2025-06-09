@@ -1,9 +1,12 @@
 #include "Pedal.h"
 
-Pedal::Pedal(juce::AudioProcessorGraph* graph, int editorW, int editorH) {
+Pedal::Pedal(juce::AudioProcessorGraph* graph, int editorW, int editorH, int w, int h, int nfh) {
     g = graph;
     editorWidth = editorW;
     editorHeight = editorH;
+    width = w;
+    height = h;
+    nameFontHeight = nfh;
 
     uid = juce::AudioProcessorGraph::NodeID(ID++);
 
@@ -15,6 +18,7 @@ Pedal::Pedal(juce::AudioProcessorGraph* graph, int editorW, int editorH) {
         DEFAULT_SAMPLE_RATE, 
         DEFAULT_BLOCK_SIZE
     );
+
     initializePorts();
 
     setSize(width, height);

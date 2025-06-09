@@ -3,11 +3,7 @@
 <JUCERPROJECT id="xFnPsi" name="PedalJUCE" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" cppLanguageStandard="20">
   <MAINGROUP id="yhwo2X" name="PedalJUCE">
-    <GROUP id="{D448E904-FD01-1219-59A5-94C109E2CE02}" name="Pedals">
-      <GROUP id="{640A33CD-813D-AB74-D7B2-445C3BEC4738}" name="IncludeScript">
-        <FILE id="HAn7gn" name="IncludeAll.c" compile="1" resource="0" file="Pedals/IncludeScript/IncludeAll.c"/>
-      </GROUP>
-    </GROUP>
+    <GROUP id="{D448E904-FD01-1219-59A5-94C109E2CE02}" name="Pedals"/>
     <GROUP id="{10A71BB5-182A-BBCF-9BE3-354943879C34}" name="Fonts">
       <FILE id="TRlFmn" name="MicrogrammaD-BoldExte.otf" compile="0" resource="1"
             file="Fonts/MicrogrammaD-BoldExte.otf"/>

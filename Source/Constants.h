@@ -30,9 +30,9 @@ const int DEFAULT_BLOCK_SIZE = 1024;
 /**
  * The default width of the editor window, in pixels.
  */
-const int DEFAULT_EDITOR_WIDTH = 1200;
+const int DEFAULT_EDITOR_WIDTH = 1000;
 
 /**
  * The default height of the editor window, in pixels.
  */
-const int DEFAULT_EDITOR_HEIGHT = 900;
+const int DEFAULT_EDITOR_HEIGHT = 750;

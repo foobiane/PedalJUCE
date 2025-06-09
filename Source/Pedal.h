@@ -78,7 +78,7 @@ class InputPort : public juce::Component {
 
 class Pedal : public juce::Component, public juce::AudioProcessor {
     public:
-        Pedal(juce::AudioProcessorGraph* g, int editorW, int editorH);
+        Pedal(juce::AudioProcessorGraph* g, int editorW, int editorH, int w = 200, int h = 300, int nfh = 36);
         ~Pedal();
 
         virtual int getPedalWidth() final;
@@ -145,6 +145,7 @@ class Pedal : public juce::Component, public juce::AudioProcessor {
         // I/O
         int numOutputChannels = 1;
         int numInputChannels = 1;
+        virtual void updatePorts() final;
 
         // DSP stuff
         int sr = DEFAULT_SAMPLE_RATE;
@@ -152,7 +153,6 @@ class Pedal : public juce::Component, public juce::AudioProcessor {
 
     private:
         void initializePorts();
-        void updatePorts();
 
         // UID
         juce::AudioProcessorGraph::NodeID uid;
