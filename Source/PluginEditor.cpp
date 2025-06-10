@@ -13,7 +13,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Adds the pedal referenced by a unique pointer to the editor interface.
-Pedal* PedalJUCEAudioProcessorEditor::addPedalToEditor(std::unique_ptr<Pedal> ped) {
+void PedalJUCEAudioProcessorEditor::addPedalToEditor(std::unique_ptr<Pedal> ped) {
     juce::AudioProcessorGraph::NodeID uid = ped->getNodeID();
     audioProcessor.connectionMap.addNode(std::move(ped), uid);
 
@@ -28,7 +28,7 @@ Pedal* PedalJUCEAudioProcessorEditor::addPedalToEditor(std::unique_ptr<Pedal> pe
     for (int i = 0; i < p->getNumInputChannels(); i++)
         addAndMakeVisible(p->inputPorts[i]);
 
-    return p;
+    pedals.push_back(p);
 }
 
 // Removes a pedal from the editor interface.
@@ -40,29 +40,42 @@ void PedalJUCEAudioProcessorEditor::removePedalFromEditor(Pedal* p) {
         removeChildComponent(p->inputPorts[i]);
 
     removeChildComponent(p);
-
-    delete p;
-}   
+}
 
 // Adds IO boxes to the editor interface.
 void PedalJUCEAudioProcessorEditor::addIOBoxesToEditor() {
     std::unique_ptr<InputBox> ipb = std::make_unique<InputBox>(&audioProcessor.connectionMap, 0.1 * editorWidth, 0.95 * editorHeight);
     std::unique_ptr<OutputBox> opb = std::make_unique<OutputBox>(&audioProcessor.connectionMap, 0.1 * editorWidth, 0.95 * editorHeight);
 
-    audioProcessor.connectionMap.addNode(std::move(ipb), INPUT_BOX_NODE_ID); // TODO: This returns a Node, which we can use to shorten later searches
-    audioProcessor.connectionMap.addNode(std::move(opb), OUTPUT_BOX_NODE_ID);
+    juce::AudioProcessorGraph::Node::Ptr ipb_node = audioProcessor.connectionMap.addNode(std::move(ipb), INPUT_BOX_NODE_ID); 
+    juce::AudioProcessorGraph::Node::Ptr opb_node = audioProcessor.connectionMap.addNode(std::move(opb), OUTPUT_BOX_NODE_ID);
 
-    InputBox* ipb_ptr = dynamic_cast<InputBox*>(audioProcessor.connectionMap.getNodeForId(INPUT_BOX_NODE_ID)->getProcessor());
+    InputBox* ipb_ptr = dynamic_cast<InputBox*>(ipb_node->getProcessor());
     addAndMakeVisible(ipb_ptr);
     
     for (int i = 0; i < ipb_ptr->getNumChannels(); i++)
         addAndMakeVisible(ipb_ptr->ports[i]);
     
-    OutputBox* opb_ptr = dynamic_cast<OutputBox*>(audioProcessor.connectionMap.getNodeForId(OUTPUT_BOX_NODE_ID)->getProcessor());
+    OutputBox* opb_ptr = dynamic_cast<OutputBox*>(opb_node->getProcessor());
     addAndMakeVisible(opb_ptr);
 
     for (int i = 0; i < opb_ptr->getNumChannels(); i++)
         addAndMakeVisible(opb_ptr->ports[i]);
+
+    outputBox = opb_ptr;
+    inputBox = ipb_ptr;
+}
+
+void PedalJUCEAudioProcessorEditor::removeIOBoxesFromEditor(InputBox* ipb, OutputBox* opb) {
+    for (int i = 0; i < ipb->getNumChannels(); i++)
+        removeChildComponent(ipb->ports[i]);
+
+    removeChildComponent(ipb);
+
+    for (int i = 0; i < opb->getNumChannels(); i++)
+        removeChildComponent(opb->ports[i]);
+
+    removeChildComponent(opb);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -75,10 +88,21 @@ PedalJUCEAudioProcessorEditor::PedalJUCEAudioProcessorEditor (PedalJUCEAudioProc
     addIOBoxesToEditor();
     addPedalToEditor(getPedalFromName("GainStage", &audioProcessor.connectionMap, editorWidth, editorHeight));
 
+    deviceManager.initialiseWithDefaultDevices(2, 2); 
+    deviceManager.addAudioCallback(&player);
+    player.setProcessor(&audioProcessor);
+
     setSize(editorWidth, editorHeight);
 }
 
 PedalJUCEAudioProcessorEditor::~PedalJUCEAudioProcessorEditor() {
+    deviceManager.removeAudioCallback(&player);
+    
+    for (Pedal* p : pedals)
+        removePedalFromEditor(p);
+    
+    removeIOBoxesFromEditor(inputBox, outputBox);
+
     audioProcessor.connectionMap.clear();
 }
 

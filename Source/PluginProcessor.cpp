@@ -10,17 +10,10 @@
 #include "PluginEditor.h"
 
 //==============================================================================
-PedalJUCEAudioProcessor::PedalJUCEAudioProcessor()
-#ifndef JucePlugin_PreferredChannelConfigurations
-     : AudioProcessor (BusesProperties()
-                     #if ! JucePlugin_IsMidiEffect
-                      #if ! JucePlugin_IsSynth
-                       .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
-                      #endif
-                       .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
-                     #endif
-                       )
-#endif
+PedalJUCEAudioProcessor::PedalJUCEAudioProcessor() : 
+    AudioProcessor (BusesProperties()
+        .withInput("Input", juce::AudioChannelSet::stereo(), true)
+        .withOutput("Output", juce::AudioChannelSet::stereo(), true))
 {
     connectionMap.setPlayConfigDetails(
         getMainBusNumInputChannels(),
@@ -111,33 +104,33 @@ void PedalJUCEAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
 
 void PedalJUCEAudioProcessor::releaseResources()
 {
-    // When playback stops, you can use this as an opportunity to free up any
-    // spare memory, etc.
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
 bool PedalJUCEAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
-  #if JucePlugin_IsMidiEffect
-    juce::ignoreUnused (layouts);
-    return true;
-  #else
-    // This is the place where you check if the layout is supported.
-    // In this template code we only support mono or stereo.
-    // Some plugin hosts, such as certain GarageBand versions, will only
-    // load plugins that support stereo bus layouts.
-    if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::mono()
-     && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
-        return false;
+//   #if JucePlugin_IsMidiEffect
+//     juce::ignoreUnused (layouts);
+//     return true;
+//   #else
+//     // This is the place where you check if the layout is supported.
+//     // In this template code we only support mono or stereo.
+//     // Some plugin hosts, such as certain GarageBand versions, will only
+//     // load plugins that support stereo bus layouts.
+//     if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::mono()
+//      && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
+//         return false;
 
-    // This checks if the input layout matches the output layout
-   #if ! JucePlugin_IsSynth
-    if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
-        return false;
-   #endif
+//     // This checks if the input layout matches the output layout
+//    #if ! JucePlugin_IsSynth
+//     if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
+//         return false;
+//    #endif
 
-    return true;
-  #endif
+//     return true;
+//   #endif
+
+    return true; // supports all layouts
 }
 #endif
 

@@ -34,10 +34,18 @@ private:
     PedalJUCEAudioProcessor& audioProcessor;
     
     void addIOBoxesToEditor();
-    Pedal* addPedalToEditor(std::unique_ptr<Pedal> ped);
+    void removeIOBoxesFromEditor(InputBox* ipb, OutputBox* opb);
+    void addPedalToEditor(std::unique_ptr<Pedal> ped);
     void removePedalFromEditor(Pedal* ped);
 
     int editorWidth = DEFAULT_EDITOR_WIDTH, editorHeight = DEFAULT_EDITOR_HEIGHT;
+
+    std::vector<Pedal*> pedals;
+    InputBox* inputBox;
+    OutputBox* outputBox;
+        
+    juce::AudioDeviceManager deviceManager;
+    juce::AudioProcessorPlayer player;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PedalJUCEAudioProcessorEditor)
 };

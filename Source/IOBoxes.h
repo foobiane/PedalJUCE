@@ -27,6 +27,9 @@ class InputBox : public juce::AudioProcessorGraph::AudioGraphIOProcessor, public
         int width, height;
         int numChannels;
 
+        juce::Font labelFont = juce::Font(juce::Typeface::createSystemTypefaceFor(BinaryData::MicrogrammaDBoldExte_otf, BinaryData::MicrogrammaDBoldExte_otfSize));
+        float labelFontHeight = 20;
+
         void initializePorts();
         void updatePorts();
 
@@ -54,6 +57,9 @@ class OutputBox : public juce::AudioProcessorGraph::AudioGraphIOProcessor, publi
     private:
         int width, height;
         int numChannels;
+
+        juce::Font labelFont = juce::Font(juce::Typeface::createSystemTypefaceFor(BinaryData::MicrogrammaDBoldExte_otf, BinaryData::MicrogrammaDBoldExte_otfSize));
+        float labelFontHeight = 16;
         
         void initializePorts();
         void updatePorts();

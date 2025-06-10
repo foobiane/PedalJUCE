@@ -9,6 +9,8 @@ InputBox::InputBox(juce::AudioProcessorGraph* graph, int w, int h) : juce::Audio
     width = w;
     height = h;
 
+    labelFont.setHeight(labelFontHeight);
+
     numChannels = g->getTotalNumInputChannels(); // TODO: Make this detect the number of audio channels automatically
 
     initializePorts();
@@ -44,6 +46,14 @@ void InputBox::paint(juce::Graphics& g) {
 
     g.setColour(juce::Colour(0.0f, 0.0f, 0.70f, 1.0f));
     g.fillRoundedRectangle(0.25 * width, 0, area.getWidth(), area.getHeight(), 20);
+
+    g.setColour(juce::Colour(0.0f, 0.0f, 0.25f, 1.0f));
+    g.setFont(labelFont);
+
+    for (int i = 0; i < numChannels; i++) {
+        juce::Point<int> connectorPoint = ports[i]->getStartPoint();
+        g.drawFittedText("Input " + std::to_string(i), 0.25 * width, connectorPoint.y - 2 * MAX_CONNECTION_RANGE - 0.5 * labelFontHeight, 0.75 * width, labelFontHeight, juce::Justification::centred, 1);
+    }
 }
 
 void InputBox::resized() {
@@ -58,6 +68,8 @@ OutputBox::OutputBox(juce::AudioProcessorGraph* graph, int w, int h) : juce::Aud
     g = graph;
     width = w;
     height = h;
+
+    labelFont.setHeight(labelFontHeight);
 
     numChannels = g->getTotalNumOutputChannels();
 
@@ -106,6 +118,14 @@ void OutputBox::paint(juce::Graphics& g) {
 
     g.setColour(juce::Colour(0.0f, 0.0f, 0.70f, 1.0f));
     g.fillRoundedRectangle(0, 0, area.getWidth(), area.getHeight(), 20);
+
+    g.setColour(juce::Colour(0.0f, 0.0f, 0.25f, 1.0f));
+    g.setFont(labelFont);
+
+    for (int i = 0; i < numChannels; i++) {
+        juce::Point<int> connectorPoint = ports[i]->getPosition().translated(MAX_CONNECTION_RANGE, MAX_CONNECTION_RANGE);
+        g.drawFittedText("Output " + std::to_string(i), 0, connectorPoint.y - 2 * MAX_CONNECTION_RANGE - 0.5 * labelFontHeight, 0.75 * width, labelFontHeight, juce::Justification::centred, 1);
+    }
 }
 
 void OutputBox::resized() {
