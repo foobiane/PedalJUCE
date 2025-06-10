@@ -11,6 +11,7 @@
 #include <JuceHeader.h>
 
 #include "Constants.h"
+#include "IOBoxes.h"
 #include "Pedal.h"
 #include "PluginProcessor.h"
 

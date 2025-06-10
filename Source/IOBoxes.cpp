@@ -14,6 +14,11 @@ InputBox::InputBox(juce::AudioProcessorGraph* graph, int w, int h) : juce::Audio
     initializePorts();
 }
 
+InputBox::~InputBox() {
+    for (Connector* c : ports)
+        delete c;
+}
+
 void InputBox::initializePorts() {
     for (int i = 0; i < numChannels; i++) {
         juce::Point<int> pos = juce::Point<int>(0, (int)((i + 1) * (height / (numChannels + 1)))) + getPosition();
@@ -57,6 +62,11 @@ OutputBox::OutputBox(juce::AudioProcessorGraph* graph, int w, int h) : juce::Aud
     numChannels = g->getTotalNumOutputChannels();
 
     initializePorts();
+}
+
+OutputBox::~OutputBox() {
+    for (InputPort* ip : ports)
+        delete ip;
 }
 
 void OutputBox::initializePorts() {

@@ -12,6 +12,10 @@ Connector::Connector(juce::AudioProcessorGraph* graph, juce::AudioProcessorGraph
     resetBounds();
 }
 
+Connector::~Connector() {
+    // Nothing for now.
+}
+
 void Connector::updateStartPoint(juce::Point<int> newStart) {
     startPoint = newStart;
     adjustBounds();
@@ -79,7 +83,7 @@ bool Connector::isConnected() {
  */
 void Connector::disconnect() {
     if (connected) {
-        g->removeConnection(juce::AudioProcessorGraph::Connection(start, end));
+        g->disconnectNode(start.nodeID);
 
         if (end.nodeID == OUTPUT_BOX_NODE_ID)
             static_cast<OutputBox*>(g->getNodeForId(end.nodeID)->getProcessor())->ports[end.channelIndex]->setIncomingConnector(nullptr);
@@ -219,6 +223,10 @@ void Connector::attemptConnection() {
             opb->ports[channel]->setIncomingConnector(this);
             g->addConnection(potentialConnection);
             connected = true; 
+
+            printf("Connection successfully made between start: {%d, %d} and end: {%d, %d}\n", start.nodeID, start.channelIndex, end.nodeID, end.channelIndex); // debug
+
+            return;
         }
     }
 
@@ -238,6 +246,8 @@ void Connector::attemptConnection() {
                 ped->inputPorts[channel]->setIncomingConnector(this); // storing the connection in the port
                 g->addConnection(potentialConnection); // marking the connection in the AudioProcessorGraph
                 connected = true; // maintaining a boolean to know when to not read end
+
+                printf("Connection successfully made between start: {%d, %d} and end: {%d, %d}\n", start.nodeID, start.channelIndex, end.nodeID, end.channelIndex); // debug
 
                 return;
             }

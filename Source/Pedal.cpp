@@ -25,10 +25,8 @@ Pedal::Pedal(juce::AudioProcessorGraph* graph, int editorW, int editorH, int w, 
 }
 
 Pedal::~Pedal() {
-    for (Connector* c : connectors) {
-        c->disconnect();
-        delete c; // TODO: Handle connections too
-    }
+    for (Connector* c : connectors)
+        delete c; // the connector destructor handles the rest
 
     for (InputPort* ip : inputPorts)
         delete ip;
@@ -79,16 +77,20 @@ void Pedal::updatePorts() {
 
 const juce::String Pedal::getName() const { return name; }
 
-void Pedal::prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) { 
+void Pedal::prepareBasics(double sampleRate, int maximumExpectedSamplesPerBlock) {
     sr = sampleRate; 
     blockSize = maximumExpectedSamplesPerBlock; 
 
     setPlayConfigDetails(
         numInputChannels, 
         numOutputChannels, 
-        DEFAULT_SAMPLE_RATE, 
-        DEFAULT_BLOCK_SIZE
+        sr, 
+        blockSize
     );
+}
+
+void Pedal::prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) { 
+    prepareBasics(sampleRate, maximumExpectedSamplesPerBlock);
 }
 
 void Pedal::releaseResources() { /* Nothing for now. */ } 

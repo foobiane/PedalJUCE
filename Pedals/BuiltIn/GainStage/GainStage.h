@@ -2,12 +2,14 @@
 
 #include "../Source/Pedal.h"
 
+#include <iostream> // debug
 #include <cmath>
 
 class GainStage : public Pedal {
     public:
         GainStage(juce::AudioProcessorGraph* g, int editorW, int editorH);
 
+        virtual void prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) override;
         virtual void processBlock(juce::AudioBuffer<float> &buffer, juce::MidiBuffer &midiMessages) override;
         virtual bool acceptsMidi() const override { return false; }
         virtual bool producesMidi() const override { return false; }
@@ -16,6 +18,7 @@ class GainStage : public Pedal {
 
     private:
         juce::Slider dbSlider;
+        juce::dsp::Gain<float> gainControl;
 
         int numOutputChannels = 1;
         int numInputChannels = 1;
@@ -31,13 +34,19 @@ GainStage::GainStage(juce::AudioProcessorGraph* g, int editorW, int editorH) : P
     dbSlider.setBounds(10, 10 + 2 * nameFontHeight + 10, width - 10, height - 30 - 2 * nameFontHeight - pedalThickness);
     addAndMakeVisible(dbSlider);
 }
+void GainStage::prepareToPlay(double sampleRate, int maximumExpectedSamplesPerBlock) {
+    prepareBasics(sampleRate, maximumExpectedSamplesPerBlock);
+
+    juce::dsp::ProcessSpec spec{sampleRate, static_cast<juce::uint32>(maximumExpectedSamplesPerBlock), 2};
+    gainControl.prepare(spec);
+}
 
 void GainStage::processBlock(juce::AudioBuffer<float> &buffer, juce::MidiBuffer &midiMessages) {
-    float fac = std::pow(10, dbSlider.getValue() / 20.0f);
+    gainControl.setGainDecibels(dbSlider.getValue());
 
     float* p = buffer.getWritePointer(0);
     for (int i = 0; i < buffer.getNumSamples(); i++)
-        p[i] *= fac;
+        p[i] = gainControl.processSample(p[i]);
 }
 
 void GainStage::paint(juce::Graphics& g) {

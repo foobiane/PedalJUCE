@@ -1,7 +1,11 @@
 #include "Pedal.h"
 
 InputPort::InputPort() {
-    /* Nothing for now. */
+    // Nothing for now.
+}
+
+InputPort::~InputPort() {
+    // Nothing for now.
 }
 
 void InputPort::setIncomingConnector(Connector* c) {

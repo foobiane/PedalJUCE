@@ -18,7 +18,8 @@ class Pedal;
 class Connector : public juce::Component {
     public:
         Connector(juce::AudioProcessorGraph* graph, juce::AudioProcessorGraph::NodeID id, int channel, juce::Point<int> startPt);
-        
+        ~Connector();
+
         bool isConnected();
         void disconnect();
 
@@ -65,6 +66,7 @@ class Connector : public juce::Component {
 class InputPort : public juce::Component {
     public:
         InputPort();
+        ~InputPort();
 
         void setIncomingConnector(Connector* c);
         Connector* getIncomingConnector();
@@ -150,6 +152,7 @@ class Pedal : public juce::Component, public juce::AudioProcessor {
         // DSP stuff
         int sr = DEFAULT_SAMPLE_RATE;
         int blockSize = DEFAULT_BLOCK_SIZE;
+        virtual void prepareBasics(double sampleRate, int maximumExpectedSamplesPerBlock) final;
 
     private:
         void initializePorts();

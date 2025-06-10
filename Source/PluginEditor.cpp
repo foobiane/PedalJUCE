@@ -8,6 +8,10 @@
 #include <memory>
 #include <type_traits>
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Pedal Manipulation
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 // Adds the pedal referenced by a unique pointer to the editor interface.
 Pedal* PedalJUCEAudioProcessorEditor::addPedalToEditor(std::unique_ptr<Pedal> ped) {
     juce::AudioProcessorGraph::NodeID uid = ped->getNodeID();
@@ -37,7 +41,6 @@ void PedalJUCEAudioProcessorEditor::removePedalFromEditor(Pedal* p) {
 
     removeChildComponent(p);
 
-    audioProcessor.connectionMap.removeNode(p->getNodeID());
     delete p;
 }   
 
@@ -62,19 +65,21 @@ void PedalJUCEAudioProcessorEditor::addIOBoxesToEditor() {
         addAndMakeVisible(opb_ptr->ports[i]);
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Editor Functionality
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 PedalJUCEAudioProcessorEditor::PedalJUCEAudioProcessorEditor (PedalJUCEAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
     addIOBoxesToEditor();
-    
-    // TODO: Add testing pedals here!
     addPedalToEditor(getPedalFromName("GainStage", &audioProcessor.connectionMap, editorWidth, editorHeight));
 
-    setSize (editorWidth, editorHeight);
+    setSize(editorWidth, editorHeight);
 }
 
 PedalJUCEAudioProcessorEditor::~PedalJUCEAudioProcessorEditor() {
-    // Nothing for now.
+    audioProcessor.connectionMap.clear();
 }
 
 void PedalJUCEAudioProcessorEditor::paint (juce::Graphics& g) {

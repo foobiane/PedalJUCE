@@ -1,3 +1,5 @@
+#pragma once
+
 #include <JuceHeader.h>
 
 #include "Pedal.h"
@@ -8,6 +10,7 @@ const juce::AudioProcessorGraph::NodeID OUTPUT_BOX_NODE_ID = juce::AudioProcesso
 class InputBox : public juce::AudioProcessorGraph::AudioGraphIOProcessor, public juce::Component {
     public:
         InputBox(juce::AudioProcessorGraph* graph, int w, int h);
+        ~InputBox();
 
         int getNumChannels() { return numChannels; }
         void setWidth(int newWidth) { width = newWidth; }
@@ -33,6 +36,7 @@ class InputBox : public juce::AudioProcessorGraph::AudioGraphIOProcessor, public
 class OutputBox : public juce::AudioProcessorGraph::AudioGraphIOProcessor, public juce::Component {
     public:
         OutputBox(juce::AudioProcessorGraph* graph, int w, int h);
+        ~OutputBox();
         
         int getNumChannels() { return numChannels; }
         void setWidth(int newWidth) { width = newWidth; }
