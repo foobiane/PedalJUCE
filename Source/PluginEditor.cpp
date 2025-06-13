@@ -40,6 +40,8 @@ void PedalJUCEAudioProcessorEditor::removePedalFromEditor(Pedal* p) {
         removeChildComponent(p->inputPorts[i]);
 
     removeChildComponent(p);
+    pedals.erase(std::find(pedals.begin(), pedals.end(), p)); // TODO: Switch the data structure to a set so this search is less expensive
+    audioProcessor.connectionMap.removeNode(p->getNodeID());
 }
 
 // Adds IO boxes to the editor interface.
@@ -76,6 +78,9 @@ void PedalJUCEAudioProcessorEditor::removeIOBoxesFromEditor(InputBox* ipb, Outpu
         removeChildComponent(opb->ports[i]);
 
     removeChildComponent(opb);
+
+    audioProcessor.connectionMap.removeNode(INPUT_BOX_NODE_ID);
+    audioProcessor.connectionMap.removeNode(OUTPUT_BOX_NODE_ID);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -95,7 +100,7 @@ void PedalJUCEAudioProcessorEditor::initializeAddPedalButton() {
     addAndMakeVisible(addPedal);
 
     addPedal.onClick = [this](){
-        addPedalToEditor(getPedalFromName(pedalSelect.getText().toStdString(), &audioProcessor.connectionMap, editorWidth, editorHeight));
+        addPedalToEditor(getPedalFromName(pedalSelect.getText().toStdString(), this));
     };
 }
 
@@ -107,7 +112,7 @@ PedalJUCEAudioProcessorEditor::PedalJUCEAudioProcessorEditor (PedalJUCEAudioProc
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
     addIOBoxesToEditor();
-    addPedalToEditor(getPedalFromName("GainStage", &audioProcessor.connectionMap, editorWidth, editorHeight));
+    // addPedalToEditor(getPedalFromName("GainStage", &audioProcessor.connectionMap, editorWidth, editorHeight));
 
     initializePedalSelect();
     initializeAddPedalButton();
@@ -127,7 +132,7 @@ PedalJUCEAudioProcessorEditor::~PedalJUCEAudioProcessorEditor() {
     
     removeIOBoxesFromEditor(inputBox, outputBox);
 
-    audioProcessor.connectionMap.clear();
+    // audioProcessor.connectionMap.clear();
 }
 
 void PedalJUCEAudioProcessorEditor::paint (juce::Graphics& g) {

@@ -1,9 +1,10 @@
 #include "Pedal.h"
+#include "PluginEditor.h"
 
-Pedal::Pedal(juce::AudioProcessorGraph* graph, int editorW, int editorH, int w, int h, int nfh) {
-    g = graph;
-    editorWidth = editorW;
-    editorHeight = editorH;
+Pedal::Pedal(PedalJUCEAudioProcessorEditor* e, int w, int h, int nfh) : trashIcon(e, this) {
+    g = &e->audioProcessor.connectionMap;
+    editor = e;
+
     width = w;
     height = h;
     nameFontHeight = nfh;
@@ -155,10 +156,28 @@ juce::Point<int> Pedal::getPositionOfOutputPort(int channel) {
 }
 
 void Pedal::mouseDown(const juce::MouseEvent& e) {
+    if (!showingTrash) {
+        addAndMakeVisible(&trashIcon);
+        showingTrash = true;
+    }
+    else {
+        removeChildComponent(&trashIcon);
+        showingTrash = false;
+    }
+
     drag.startDraggingComponent(this, e);
 }
 
 void Pedal::mouseDrag(const juce::MouseEvent& e) {
     drag.dragComponent(this, e, nullptr);
     updatePorts();
+}
+
+void Pedal::TrashIcon::paint(juce::Graphics& g) {
+    g.setColour(juce::Colours::red);
+    g.fillEllipse(getBounds().toFloat());
+}
+
+void Pedal::TrashIcon::mouseDown(const juce::MouseEvent& e) {
+    editor->removePedalFromEditor(pedal);
 }

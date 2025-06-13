@@ -7,7 +7,7 @@
 
 class GainStage : public Pedal {
     public:
-        GainStage(juce::AudioProcessorGraph* g, int editorW, int editorH);
+        GainStage(PedalJUCEAudioProcessorEditor* e);
 
         virtual void prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) override;
         virtual void processBlock(juce::AudioBuffer<float> &buffer, juce::MidiBuffer &midiMessages) override;
@@ -21,7 +21,7 @@ class GainStage : public Pedal {
         std::string name = "Gain Stage";
 };
 
-GainStage::GainStage(juce::AudioProcessorGraph* g, int editorW, int editorH) : Pedal(g, editorW, editorH, 100, 300, 30) {
+GainStage::GainStage(PedalJUCEAudioProcessorEditor* e) : Pedal(e, 100, 300, 30) {
     dbSlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
     dbSlider.setRange(juce::Range<double>(-24.0f, 24.0f), 0.01);
     dbSlider.setValue(0.0f);

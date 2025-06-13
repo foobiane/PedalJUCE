@@ -30,14 +30,14 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
 
-private:
-    PedalJUCEAudioProcessor& audioProcessor;
-    
     void addIOBoxesToEditor();
     void removeIOBoxesFromEditor(InputBox* ipb, OutputBox* opb);
     void addPedalToEditor(std::unique_ptr<Pedal> ped);
     void removePedalFromEditor(Pedal* ped);
 
+    PedalJUCEAudioProcessor& audioProcessor;
+
+private:
     void initializePedalSelect();
     void initializeAddPedalButton();
 

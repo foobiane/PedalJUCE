@@ -15,6 +15,9 @@ static juce::uint32 ID = 2;
 // Forward declaring the Pedal class for use in Connector
 class Pedal;
 
+// Forward declaring our editor class for use in Pedal
+class PedalJUCEAudioProcessorEditor;
+
 class Connector : public juce::Component {
     public:
         Connector(juce::AudioProcessorGraph* graph, juce::AudioProcessorGraph::NodeID id, int channel, juce::Point<int> startPt);
@@ -80,7 +83,7 @@ class InputPort : public juce::Component {
 
 class Pedal : public juce::Component, public juce::AudioProcessor {
     public:
-        Pedal(juce::AudioProcessorGraph* g, int editorW, int editorH, int w = 200, int h = 300, int nfh = 36);
+        Pedal(PedalJUCEAudioProcessorEditor* e, int w = 200, int h = 300, int nfh = 36);
         ~Pedal();
 
         virtual int getPedalWidth() final;
@@ -131,7 +134,7 @@ class Pedal : public juce::Component, public juce::AudioProcessor {
         
     protected:
         // Name stuff
-        std::string name = "DEFAULT";
+        std::string name = "Default";
         juce::Font nameFont = juce::Font(juce::Typeface::createSystemTypefaceFor(BinaryData::MicrogrammaDBoldExte_otf, BinaryData::MicrogrammaDBoldExte_otfSize));
         float nameFontHeight = 36;
 
@@ -139,10 +142,6 @@ class Pedal : public juce::Component, public juce::AudioProcessor {
         int width = 200;
         int height = 300;
         int pedalThickness = 25;
-
-        // Editor dimensions, which can be used to set the width and height
-        int editorWidth;
-        int editorHeight;
 
         // I/O
         int numOutputChannels = 1;
@@ -154,11 +153,27 @@ class Pedal : public juce::Component, public juce::AudioProcessor {
         int blockSize = DEFAULT_BLOCK_SIZE;
         virtual void prepareBasics(double sampleRate, int maximumExpectedSamplesPerBlock) final;
 
+        // Pedal removing functionality
+        bool showingTrash = false;
+        class TrashIcon : public juce::Component {
+            public:
+                TrashIcon(PedalJUCEAudioProcessorEditor* e, Pedal* p) : editor(e), pedal(p) { }
+
+                void paint(juce::Graphics& g) override;
+                void mouseDown(const juce::MouseEvent& e) override;
+
+            private:
+                PedalJUCEAudioProcessorEditor* editor;
+                Pedal* pedal;
+        };
+        TrashIcon trashIcon;
+
     private:
         void initializePorts();
 
         // UID
         juce::AudioProcessorGraph::NodeID uid;
 
+        PedalJUCEAudioProcessorEditor* editor;
         juce::AudioProcessorGraph* g;
 };

@@ -2,10 +2,8 @@
 
 #include <JuceHeader.h>
 
+#include "Constants.h"
 #include "Pedal.h"
-
-const juce::AudioProcessorGraph::NodeID INPUT_BOX_NODE_ID = juce::AudioProcessorGraph::NodeID(0);
-const juce::AudioProcessorGraph::NodeID OUTPUT_BOX_NODE_ID = juce::AudioProcessorGraph::NodeID(1);
 
 class InputBox : public juce::AudioProcessorGraph::AudioGraphIOProcessor, public juce::Component {
     public:

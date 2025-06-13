@@ -36,3 +36,13 @@ const int DEFAULT_EDITOR_WIDTH = 1000;
  * The default height of the editor window, in pixels.
  */
 const int DEFAULT_EDITOR_HEIGHT = 750;
+
+/**
+ * The default NodeID of the InputBox object.
+ */
+const juce::AudioProcessorGraph::NodeID INPUT_BOX_NODE_ID = juce::AudioProcessorGraph::NodeID(0);
+
+/**
+ * The defalt NodeID of the OutputBox object.
+ */
+const juce::AudioProcessorGraph::NodeID OUTPUT_BOX_NODE_ID = juce::AudioProcessorGraph::NodeID(1);
