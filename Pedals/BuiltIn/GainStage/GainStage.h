@@ -11,17 +11,12 @@ class GainStage : public Pedal {
 
         virtual void prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) override;
         virtual void processBlock(juce::AudioBuffer<float> &buffer, juce::MidiBuffer &midiMessages) override;
-        virtual bool acceptsMidi() const override { return false; }
-        virtual bool producesMidi() const override { return false; }
 
         virtual void paint(juce::Graphics& g) override;
 
     private:
         juce::Slider dbSlider;
         juce::dsp::Gain<float> gainControl;
-
-        int numOutputChannels = 1;
-        int numInputChannels = 1;
 
         std::string name = "Gain Stage";
 };

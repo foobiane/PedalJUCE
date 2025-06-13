@@ -38,7 +38,24 @@ private:
     void addPedalToEditor(std::unique_ptr<Pedal> ped);
     void removePedalFromEditor(Pedal* ped);
 
-    int editorWidth = DEFAULT_EDITOR_WIDTH, editorHeight = DEFAULT_EDITOR_HEIGHT;
+    void initializePedalSelect();
+    void initializeAddPedalButton();
+
+    juce::ComboBox pedalSelect;
+
+    class AddPedalButton : public juce::TextButton {
+      public:
+        void paintButton(juce::Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) {
+          g.setColour(juce::Colours::lightblue);
+          g.fillEllipse(getLocalBounds().toFloat());
+
+          g.setColour(juce::Colours::white);
+          g.setFont(juce::Font(juce::FontOptions("Arial", getLocalBounds().getHeight(), 0)));
+          g.drawFittedText("+", getLocalBounds(), juce::Justification::centred, 1);
+        }
+    };
+
+    AddPedalButton addPedal;
 
     std::vector<Pedal*> pedals;
     InputBox* inputBox;
@@ -46,6 +63,8 @@ private:
         
     juce::AudioDeviceManager deviceManager;
     juce::AudioProcessorPlayer player;
+
+    int editorWidth = DEFAULT_EDITOR_WIDTH, editorHeight = DEFAULT_EDITOR_HEIGHT;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PedalJUCEAudioProcessorEditor)
 };

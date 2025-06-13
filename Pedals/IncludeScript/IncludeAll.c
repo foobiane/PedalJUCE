@@ -1,8 +1,15 @@
 #include <dirent.h>
 #include <limits.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+bool is_header_file(char* name) {
+    char* extension_start = strrchr(name, '.');
+
+    return !strncmp(name + strlen(name) - 2, ".h", 2);
+}
 
 // Constructs a dynamically-allocated array of file names in the specified directory, recursing to
 // any subdirectories.
@@ -20,7 +27,8 @@ void recurse_directories(char* path, char** filenames, int* num_files) {
         // Files: Add filename to array
         switch (dir->d_type) {
             case DT_REG: {
-                if (dir->d_name[0] == '.')
+                if (!is_header_file(dir->d_name))
+                    break;
 
                 *num_files += 1;
                 filenames = realloc(filenames, *num_files * sizeof(char*));

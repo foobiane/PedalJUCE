@@ -79,7 +79,28 @@ void PedalJUCEAudioProcessorEditor::removeIOBoxesFromEditor(InputBox* ipb, Outpu
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// Editor Functionality
+// Editor Subcomponent Functionality
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+void PedalJUCEAudioProcessorEditor::initializePedalSelect() {
+    addAndMakeVisible(pedalSelect);
+
+    for (int i = 0; i < PEDAL_TYPES.size(); i++)
+        pedalSelect.addItem(PEDAL_TYPES[i], i+1);
+
+    pedalSelect.setSelectedItemIndex(1);
+}
+
+void PedalJUCEAudioProcessorEditor::initializeAddPedalButton() {
+    addAndMakeVisible(addPedal);
+
+    addPedal.onClick = [this](){
+        addPedalToEditor(getPedalFromName(pedalSelect.getText().toStdString(), &audioProcessor.connectionMap, editorWidth, editorHeight));
+    };
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// Editor Main Functionality
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 PedalJUCEAudioProcessorEditor::PedalJUCEAudioProcessorEditor (PedalJUCEAudioProcessor& p)
@@ -87,6 +108,9 @@ PedalJUCEAudioProcessorEditor::PedalJUCEAudioProcessorEditor (PedalJUCEAudioProc
 {
     addIOBoxesToEditor();
     addPedalToEditor(getPedalFromName("GainStage", &audioProcessor.connectionMap, editorWidth, editorHeight));
+
+    initializePedalSelect();
+    initializeAddPedalButton();
 
     deviceManager.initialiseWithDefaultDevices(2, 2); 
     deviceManager.addAudioCallback(&player);
@@ -111,6 +135,9 @@ void PedalJUCEAudioProcessorEditor::paint (juce::Graphics& g) {
 }
 
 void PedalJUCEAudioProcessorEditor::resized() {
+    addPedal.setBounds((editorWidth - 135) / 2.0f, editorHeight - 35, 25, 25);
+    pedalSelect.setBounds((editorWidth - 135) / 2.0f + 35, editorHeight - 35, 100, 25);
+
     for (juce::AudioProcessorGraph::Node* n: audioProcessor.connectionMap.getNodes()) {
         if (n->nodeID == INPUT_BOX_NODE_ID) {
             InputBox* ipb = dynamic_cast<InputBox*>(n->getProcessor());
