@@ -1,7 +1,9 @@
 #include "Pedal.h"
 #include "PluginEditor.h"
 
-Pedal::Pedal(PedalJUCEAudioProcessorEditor* e, int w, int h, int nfh) : trashIcon(e, this) {
+Pedal::Pedal(PedalJUCEAudioProcessorEditor* e, int w, int h, int nfh) : 
+    trashIcon(e, this) 
+{
     g = &e->audioProcessor.connectionMap;
     editor = e;
 
@@ -157,6 +159,7 @@ juce::Point<int> Pedal::getPositionOfOutputPort(int channel) {
 
 void Pedal::mouseDown(const juce::MouseEvent& e) {
     if (!showingTrash) {
+        trashIcon.setBounds(width - 25, 0, 25, 25);
         addAndMakeVisible(&trashIcon);
         showingTrash = true;
     }
@@ -173,9 +176,18 @@ void Pedal::mouseDrag(const juce::MouseEvent& e) {
     updatePorts();
 }
 
+Pedal::TrashIcon::TrashIcon(PedalJUCEAudioProcessorEditor* e, Pedal* p) : 
+    icon(juce::ImageFileFormat::loadFrom(BinaryData::trashsolid_png, BinaryData::trashsolid_pngSize)),
+    editor(e), 
+    pedal(p)
+{
+
+}
+
 void Pedal::TrashIcon::paint(juce::Graphics& g) {
-    g.setColour(juce::Colours::red);
-    g.fillEllipse(getBounds().toFloat());
+    int width = getLocalBounds().getWidth();
+    int height = getLocalBounds().getHeight();
+    g.drawImageWithin(icon, 0, 0, width, height, juce::RectanglePlacement::stretchToFit);
 }
 
 void Pedal::TrashIcon::mouseDown(const juce::MouseEvent& e) {

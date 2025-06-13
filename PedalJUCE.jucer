@@ -3,9 +3,14 @@
 <JUCERPROJECT id="xFnPsi" name="PedalJUCE" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" cppLanguageStandard="20">
   <MAINGROUP id="yhwo2X" name="PedalJUCE">
-    <GROUP id="{10A71BB5-182A-BBCF-9BE3-354943879C34}" name="Fonts">
-      <FILE id="TRlFmn" name="MicrogrammaD-BoldExte.otf" compile="0" resource="1"
-            file="Fonts/MicrogrammaD-BoldExte.otf"/>
+    <GROUP id="{D448E904-FD01-1219-59A5-94C109E2CE02}" name="Resources">
+      <GROUP id="{10A71BB5-182A-BBCF-9BE3-354943879C34}" name="Fonts">
+        <FILE id="UhHiII" name="MicrogrammaD-BoldExte.otf" compile="0" resource="1"
+              file="Resources/Fonts/MicrogrammaD-BoldExte.otf"/>
+      </GROUP>
+      <GROUP id="{640A33CD-813D-AB74-D7B2-445C3BEC4738}" name="Icons">
+        <FILE id="uOkmrK" name="trash-solid.png" compile="0" resource="1" file="Resources/Icons/trash-solid.png"/>
+      </GROUP>
     </GROUP>
     <GROUP id="{7E2514A9-DB32-719E-2787-3FC40C574178}" name="Source">
       <FILE id="rokl1x" name="IOBoxes.cpp" compile="1" resource="0" file="Source/IOBoxes.cpp"/>

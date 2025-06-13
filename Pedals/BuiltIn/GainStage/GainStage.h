@@ -21,7 +21,9 @@ class GainStage : public Pedal {
         std::string name = "Gain Stage";
 };
 
-GainStage::GainStage(PedalJUCEAudioProcessorEditor* e) : Pedal(e, 100, 300, 30) {
+GainStage::GainStage(PedalJUCEAudioProcessorEditor* e) : 
+    Pedal(e, 100, 300, 30) 
+{
     dbSlider.setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
     dbSlider.setRange(juce::Range<double>(-24.0f, 24.0f), 0.01);
     dbSlider.setValue(0.0f);

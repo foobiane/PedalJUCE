@@ -157,12 +157,13 @@ class Pedal : public juce::Component, public juce::AudioProcessor {
         bool showingTrash = false;
         class TrashIcon : public juce::Component {
             public:
-                TrashIcon(PedalJUCEAudioProcessorEditor* e, Pedal* p) : editor(e), pedal(p) { }
+                TrashIcon(PedalJUCEAudioProcessorEditor* e, Pedal* p);
 
                 void paint(juce::Graphics& g) override;
                 void mouseDown(const juce::MouseEvent& e) override;
 
             private:
+                juce::Image icon;
                 PedalJUCEAudioProcessorEditor* editor;
                 Pedal* pedal;
         };
