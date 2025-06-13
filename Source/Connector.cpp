@@ -10,6 +10,9 @@ Connector::Connector(juce::AudioProcessorGraph* graph, juce::AudioProcessorGraph
     startPoint = startPt;
 
     resetBounds();
+    juce::Rectangle<int> bounds = getBounds(); // debugging
+    printf("startPoint: (%d, %d)\n", startPoint.x, startPoint.y);
+    printf("getBounds(): (%d, %d, %d, %d)\n", bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight());
 }
 
 Connector::~Connector() {
@@ -91,6 +94,8 @@ void Connector::disconnect() {
             getEndPedal()->inputPorts[end.channelIndex]->setIncomingConnector(nullptr);
 
         connected = false;
+
+        resetBounds();
     }
 }
 

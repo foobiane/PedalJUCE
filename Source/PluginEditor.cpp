@@ -36,8 +36,12 @@ void PedalJUCEAudioProcessorEditor::removePedalFromEditor(Pedal* p) {
     for (int i = 0; i < p->getNumOutputChannels(); i++)
         removeChildComponent(p->connectors[i]);
     
-    for (int i = 0; i < p->getNumInputChannels(); i++)
+    for (int i = 0; i < p->getNumInputChannels(); i++) {
+        if (p->inputPorts[i]->getIncomingConnector() != nullptr)
+            p->inputPorts[i]->getIncomingConnector()->disconnect();
+        
         removeChildComponent(p->inputPorts[i]);
+    }
 
     removeChildComponent(p);
     pedals.erase(std::find(pedals.begin(), pedals.end(), p)); // TODO: Switch the data structure to a set so this search is less expensive

@@ -13,6 +13,10 @@ InputBox::InputBox(juce::AudioProcessorGraph* graph, int w, int h) : juce::Audio
 
     numChannels = g->getTotalNumInputChannels(); // TODO: Make this detect the number of audio channels automatically
 
+    // TODO: We are running into a problem where the ports are being initialized before the bounds have properly been set.
+    // This causes issues where the connector will sense clicks outside of what should be its normal range, creating a "sticky"
+    // UI for the first couple clicks. We need to find a way to initialize ports *after* the bounds have been set. This would
+    // involve setting the bounds somewhere around here.
     initializePorts();
 }
 
