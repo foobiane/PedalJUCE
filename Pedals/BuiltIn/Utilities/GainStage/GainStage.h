@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Source/Pedal.h"
+#include "../../../../Source/Pedal.h"
 
 #include <iostream> // debug
 #include <cmath>
@@ -42,7 +42,9 @@ void GainStage::processBlock(juce::AudioBuffer<float> &buffer, juce::MidiBuffer 
     gainControl.setGainDecibels(dbSlider.getValue());
 
     float* p = buffer.getWritePointer(0);
-    for (int i = 0; i < buffer.getNumSamples(); i++)
+    int n = buffer.getNumSamples();
+
+    for (int i = 0; i < n; i++)
         p[i] = gainControl.processSample(p[i]);
 }
 

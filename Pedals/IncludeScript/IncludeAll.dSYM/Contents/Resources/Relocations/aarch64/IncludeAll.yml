@@ -1,0 +1,10 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     IncludeAll
+relocations:
+  - { offset: 0x26, size: 0x8, addend: 0x0, symName: _is_header_file, symObjAddr: 0x0, symBinAddr: 0x1000005B8, symSize: 0x7C }
+  - { offset: 0x54, size: 0x8, addend: 0x0, symName: _is_header_file, symObjAddr: 0x0, symBinAddr: 0x1000005B8, symSize: 0x7C }
+  - { offset: 0x7C, size: 0x8, addend: 0x0, symName: _recurse_directories, symObjAddr: 0x7C, symBinAddr: 0x100000634, symSize: 0x2EC }
+  - { offset: 0xF4, size: 0x8, addend: 0x0, symName: _construct_include_file, symObjAddr: 0x368, symBinAddr: 0x100000920, symSize: 0x2B4 }
+  - { offset: 0x1C0, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x61C, symBinAddr: 0x100000BD4, symSize: 0xF8 }
+...

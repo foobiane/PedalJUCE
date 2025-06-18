@@ -13,6 +13,8 @@
       </GROUP>
     </GROUP>
     <GROUP id="{7E2514A9-DB32-719E-2787-3FC40C574178}" name="Source">
+      <FILE id="CA3rg2" name="Constants.h" compile="0" resource="0" file="Source/Constants.h"/>
+      <FILE id="tCsEVl" name="DSPExtras.h" compile="0" resource="0" file="Source/DSPExtras.h"/>
       <FILE id="rokl1x" name="IOBoxes.cpp" compile="1" resource="0" file="Source/IOBoxes.cpp"/>
       <FILE id="y1JK0K" name="IOBoxes.h" compile="0" resource="0" file="Source/IOBoxes.h"/>
       <FILE id="tzfAJJ" name="InputPort.cpp" compile="1" resource="0" file="Source/InputPort.cpp"/>
@@ -89,7 +91,7 @@
       </MODULEPATHS>
     </VS2022>
     <XCODE_MAC targetFolder="Builds/MacOSX" microphonePermissionNeeded="1" iosBluetoothPermissionNeeded="1"
-               prebuildCommand="cd ../../Pedals/IncludeScript&#10;gcc IncludeAll.c -o IncludeAll&#10; ./IncludeAll"
+               prebuildCommand="cd ../../Pedals/IncludeScript&#10;gcc IncludeAll.c -o IncludeAll -g&#10; ./IncludeAll"
                applicationCategory="public.app-category.music">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug"/>

@@ -6,14 +6,12 @@
 #include <string.h>
 
 bool is_header_file(char* name) {
-    char* extension_start = strrchr(name, '.');
-
-    return !strncmp(name + strlen(name) - 2, ".h", 2);
+    return strlen(name) >= 2 && !strncmp(name + strlen(name) - 2, ".h", 2);
 }
 
 // Constructs a dynamically-allocated array of file names in the specified directory, recursing to
 // any subdirectories.
-void recurse_directories(char* path, char** filenames, int* num_files) {
+void recurse_directories(char* path, char*** filenames, int* num_files) {
     DIR* d = opendir(path);
     struct dirent *dir;
 
@@ -31,16 +29,16 @@ void recurse_directories(char* path, char** filenames, int* num_files) {
                     break;
 
                 *num_files += 1;
-                filenames = realloc(filenames, *num_files * sizeof(char*));
+                *filenames = realloc(*filenames, *num_files * sizeof(char*));
 
-                filenames[*num_files - 1] = strdup(path);
-                filenames[*num_files - 1] = realloc(filenames[*num_files - 1], strlen(path) + strlen(dir->d_name) + 2);
-                strcat(strcat(filenames[*num_files - 1], "/"), dir->d_name);
+                (*filenames)[*num_files - 1] = strdup(path);
+                (*filenames)[*num_files - 1] = realloc((*filenames)[*num_files - 1], strlen(path) + strlen(dir->d_name) + 2);
+                strcat(strcat((*filenames)[*num_files - 1], "/"), dir->d_name);
 
-                printf("Added %s to list of filenames\n", filenames[*num_files - 1]);
+                printf("Added %s to list of filenames\n", (*filenames)[*num_files - 1]);
 
                 break;
-            }
+            };
             
             // Directories: Recurse into them
             case DT_DIR: {
@@ -56,7 +54,7 @@ void recurse_directories(char* path, char** filenames, int* num_files) {
                 free(new_path);
 
                 break;
-            }
+            };
 
             // Other files: Ignore
             default:
@@ -119,7 +117,7 @@ int main(void) {
     char init_path[PATH_MAX];
     realpath("../", init_path);
 
-    recurse_directories(init_path, filenames, &num_files);
+    recurse_directories(init_path, &filenames, &num_files);
     construct_include_file(filenames, num_files);
 
     // Cleanup
